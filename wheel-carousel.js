@@ -31,6 +31,7 @@
         card.style.removeProperty('filter');
         card.style.removeProperty('pointer-events');
         card.style.removeProperty('z-index');
+        card.style.removeProperty('--wheel-z');
         card.style.removeProperty('transform');
         card.style.removeProperty('--wheel-transform');
         card.style.removeProperty('background');
@@ -64,6 +65,11 @@
     function applyTransform(card, transform) {
       card.style.setProperty('--wheel-transform', transform);
       card.style.transform = transform;
+    }
+
+    function applyZ(card, z) {
+      card.style.setProperty('--wheel-z', String(z));
+      card.style.zIndex = String(z);
     }
 
     function render() {
@@ -145,7 +151,7 @@
         const transform = `translate3d(${x}px, ${y}px, 0) rotate(${rotate}deg) scale(${scale})`;
         applyTransform(card, transform);
         card.style.opacity = String(opacity);
-        card.style.zIndex = String(z);
+        applyZ(card, z);
         card.style.pointerEvents = pointer;
       });
     }
