@@ -27,8 +27,8 @@
 
     function circularDiff(index, current, total) {
       let diff = index - current;
-      if (diff > total / 2) diff -= total;
-      if (diff < -total / 2) diff += total;
+      // True infinite wrap. This works even after hundreds of swipes.
+      diff -= Math.round(diff / total) * total;
       return diff;
     }
 
@@ -75,11 +75,21 @@
       });
     }
 
+    function normalizePosition() {
+      if (Math.abs(position) < total * 2 && Math.abs(targetPosition) < total * 2) return;
+      const shift = Math.round(position / total) * total;
+      position -= shift;
+      targetPosition -= shift;
+      startPosition -= shift;
+    }
+
     function render() {
       if (!isMobileWheel()) {
         clearDesktopInlineStyles();
         return;
       }
+
+      normalizePosition();
 
       const centerX = viewport.clientWidth / 2;
       const centerY = 22;
@@ -133,14 +143,6 @@
       });
     }
 
-    function normalizePosition() {
-      if (Math.abs(position) < total * 4 && Math.abs(targetPosition) < total * 4) return;
-      const shift = Math.round(position / total) * total;
-      position -= shift;
-      targetPosition -= shift;
-      startPosition -= shift;
-    }
-
     function animateToTarget() {
       if (!isMobileWheel()) {
         render();
@@ -157,7 +159,6 @@
         position = targetPosition;
         velocity = 0;
         render();
-        normalizePosition();
         raf = null;
         return;
       }
