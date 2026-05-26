@@ -1,0 +1,13 @@
+{
+  "name": "Drift Weight Tracker",
+  "short_name": "Drift",
+  "description": "Track daily weigh-ins and understand your real trend.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["fullscreen", "standalone", "minimal-ui", "browser"],
+  "background_color": "#F4F0E8",
+  "theme_color": "#F4F0E8",
+  "orientation": "portrait-primary",
+  "icons": []
+}
