@@ -169,16 +169,33 @@
 
   .shell[data-screen-label="trends"] .grid.grid-2 > .card {
     min-width: 0 !important;
+    overflow: visible !important;
+  }
+
+  /* Weekly bars: prevent tiny labels from colliding with the bar chart on mobile. */
+  .shell[data-screen-label="trends"] .grid.grid-2 > .card:first-child div[style*="align-items: end"] {
+    height: 190px !important;
+    gap: 6px !important;
+    align-items: flex-end !important;
+    padding-top: 4px !important;
     overflow: hidden !important;
   }
 
-  .shell[data-screen-label="trends"] .grid.grid-2 > .card:first-child div[style*="align-items: end"] {
-    height: 150px !important;
+  .shell[data-screen-label="trends"] .grid.grid-2 > .card:first-child div[style*="align-items: center"] {
+    min-width: 0 !important;
     gap: 5px !important;
   }
 
-  .shell[data-screen-label="trends"] .grid.grid-2 > .card:first-child div[style*="font-size: 11"] {
-    font-size: 9px !important;
+  .shell[data-screen-label="trends"] .grid.grid-2 > .card:first-child div[style*="font-size: 11"],
+  .shell[data-screen-label="trends"] .grid.grid-2 > .card:first-child div[style*="font-size: 10"] {
+    font-size: 8px !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+  }
+
+  .shell[data-screen-label="trends"] .grid.grid-2 > .card:first-child div[style*="border-radius: 8px"] {
+    max-height: 132px !important;
+    min-height: 14px !important;
   }
 
   .shell[data-screen-label="trends"] .grid.grid-2 > .card:nth-child(2) div[style*="repeat(14"] {
@@ -204,5 +221,22 @@
   .shell[data-screen-label="trends"] .grid.grid-4 .card {
     padding-left: 8px !important;
     padding-right: 8px !important;
+  }
+
+  .shell[data-screen-label="trends"] .grid.grid-2 > .card:first-child div[style*="align-items: end"] {
+    height: 170px !important;
+    gap: 4px !important;
+  }
+
+  .shell[data-screen-label="trends"] .grid.grid-2 > .card:first-child div[style*="font-size: 11"] {
+    display: none !important;
+  }
+
+  .shell[data-screen-label="trends"] .grid.grid-2 > .card:first-child div[style*="font-size: 10"] {
+    display: none !important;
+  }
+
+  .shell[data-screen-label="trends"] .grid.grid-2 > .card:first-child div[style*="border-radius: 8px"] {
+    max-height: 150px !important;
   }
 }
