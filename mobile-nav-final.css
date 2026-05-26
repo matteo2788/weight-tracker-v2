@@ -14,94 +14,49 @@
     overflow-x: hidden !important;
   }
 
-  body::before {
-    display: none !important;
-    content: none !important;
-  }
-
-  /* Floating overlay: app name + menu without creating a visible header bar. */
+  /* Kill the real nav completely on mobile so it cannot open the menu drawer. */
   .nav {
-    display: block !important;
-    position: absolute !important;
-    top: 10px !important;
-    left: 0 !important;
-    right: 0 !important;
-    height: 0 !important;
-    min-height: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    background: transparent !important;
-    border: 0 !important;
-    box-shadow: none !important;
-    overflow: visible !important;
-    z-index: 40 !important;
-    pointer-events: none !important;
-  }
-
-  .nav .container {
-    padding-left: 24px !important;
-    padding-right: 24px !important;
-  }
-
-  .nav-inner {
-    height: 44px !important;
-    min-height: 44px !important;
-    max-height: 44px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    overflow: visible !important;
-    pointer-events: auto !important;
-  }
-
-  .logo {
-    display: block !important;
-    font-size: 25px !important;
-    line-height: 1 !important;
-    transform: none !important;
-    position: relative !important;
-  }
-
-  .nav-links {
     display: none !important;
   }
 
-  .nav-right {
-    display: flex !important;
-    align-items: center !important;
-    gap: 0 !important;
-    transform: none !important;
-    position: relative !important;
+  /* Visual-only app chrome. This is not clickable, so it cannot break the layout. */
+  body::before {
+    content: "Drift";
+    position: absolute;
+    top: 14px;
+    left: 24px;
+    z-index: 80;
+    font-family: "Instrument Serif", Georgia, serif;
+    font-style: italic;
+    font-size: 25px;
+    line-height: 1;
+    color: #171614;
+    pointer-events: none;
   }
 
-  .nav-right .btn,
-  .nav-right .avatar,
-  .nav-right .bell,
-  .nav-right .search,
-  .nav-right > button:not(.icon-btn) {
-    display: none !important;
-  }
-
-  .icon-btn {
-    display: inline-flex !important;
-    width: 44px !important;
-    height: 44px !important;
-    align-items: center !important;
-    justify-content: center !important;
-    border-radius: 999px !important;
-    background: rgba(255, 255, 255, .64) !important;
-    border: 1px solid rgba(23, 22, 20, .12) !important;
-    box-shadow: 0 10px 24px rgba(18, 16, 12, .08) !important;
-    color: #171614 !important;
-    transform: none !important;
-    position: relative !important;
-    backdrop-filter: blur(14px) !important;
-    -webkit-backdrop-filter: blur(14px) !important;
-  }
-
-  .icon-btn svg {
-    width: 20px !important;
-    height: 20px !important;
+  body::after {
+    content: "v";
+    position: absolute;
+    top: 8px;
+    right: 24px;
+    z-index: 80;
+    width: 44px;
+    height: 44px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "Geist", system-ui, sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1;
+    color: #171614;
+    background: rgba(255, 255, 255, .64);
+    border: 1px solid rgba(23, 22, 20, .12);
+    box-shadow: 0 10px 24px rgba(18, 16, 12, .08);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    pointer-events: none;
   }
 
   .hero {
@@ -110,23 +65,18 @@
 }
 
 @media (max-width: 480px) {
-  .nav {
-    top: 8px !important;
+  body::before {
+    top: 12px;
+    left: 24px;
+    font-size: 24px;
   }
 
-  .nav .container {
-    padding-left: 24px !important;
-    padding-right: 24px !important;
-  }
-
-  .nav-inner {
-    height: 42px !important;
-    min-height: 42px !important;
-    max-height: 42px !important;
-  }
-
-  .logo {
-    font-size: 24px !important;
+  body::after {
+    top: 6px;
+    right: 24px;
+    width: 42px;
+    height: 42px;
+    font-size: 17px;
   }
 
   .hero {
