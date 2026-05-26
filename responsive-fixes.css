@@ -29,6 +29,23 @@
   overflow: visible;
 }
 
+/* Fully remove the Claude float-card click/hover pop animation everywhere. */
+.float-card,
+.float-card:hover,
+.float-card:active,
+.float-card:focus,
+.float-card:focus-visible {
+  box-shadow: var(--shadow-lg) !important;
+  outline: none !important;
+}
+
+.float-card:hover,
+.float-card:active,
+.float-card:focus,
+.float-card:focus-visible {
+  z-index: auto !important;
+}
+
 /* Give the floating card gallery more breathing room on medium screens */
 @media (min-width: 821px) and (max-width: 1120px) {
   .stage {
@@ -161,15 +178,7 @@
     user-select: none;
   }
 
-  /* Kill the mobile card pop/press animation that fights swiping. */
-  .stage-scroll .float-card:hover,
-  .stage-scroll .float-card:active,
-  .stage-scroll .float-card:focus,
-  .stage-scroll .float-card:focus-visible {
-    box-shadow: var(--shadow-lg) !important;
-    outline: none !important;
-  }
-
+  /* Extra hard kill: no card children should steal the swipe gesture. */
   .stage-scroll .float-card * {
     pointer-events: none !important;
     user-select: none;
