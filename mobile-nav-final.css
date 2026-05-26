@@ -1,0 +1,81 @@
+/* Final mobile nav fix — loaded last so it beats earlier sticky/safe-area rules */
+
+@media (max-width: 820px) {
+  html,
+  body {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+  }
+
+  .nav {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+    padding-top: max(18px, env(safe-area-inset-top, 0px)) !important;
+    padding-bottom: 10px !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    transform: none !important;
+    background: rgba(244, 240, 232, .96) !important;
+    border-bottom: 1px solid rgba(23, 22, 20, .08) !important;
+    z-index: 10 !important;
+  }
+
+  .nav .container {
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+  }
+
+  .nav-inner {
+    height: 56px !important;
+    min-height: 56px !important;
+    max-height: none !important;
+    overflow: visible !important;
+    display: flex !important;
+    align-items: center !important;
+  }
+
+  .logo,
+  .nav-right,
+  .nav-links,
+  .btn,
+  .avatar,
+  .icon-btn {
+    transform: none !important;
+    position: relative !important;
+    top: auto !important;
+    bottom: auto !important;
+  }
+
+  .logo {
+    line-height: 1 !important;
+  }
+
+  .hero {
+    padding-top: 44px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav {
+    padding-top: max(18px, env(safe-area-inset-top, 0px)) !important;
+    padding-bottom: 10px !important;
+  }
+
+  .nav .container {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+
+  .nav-inner {
+    height: 54px !important;
+    min-height: 54px !important;
+  }
+
+  .hero {
+    padding-top: 38px !important;
+  }
+}
