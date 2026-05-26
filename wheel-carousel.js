@@ -1,12 +1,10 @@
 (function () {
-  function isMobileWheel() {
-    return window.matchMedia('(max-width: 820px)').matches;
+  function mod(n, m) {
+    return ((n % m) + m) % m;
   }
 
-  function nearestCircularDiff(index, current, total) {
-    let diff = index - current;
-    diff -= Math.round(diff / total) * total;
-    return diff;
+  function isMobileWheel() {
+    return window.matchMedia('(max-width: 820px)').matches;
   }
 
   function setupWheel() {
@@ -20,16 +18,12 @@
     if (stage.dataset.wheelReady === 'true') return;
     stage.dataset.wheelReady = 'true';
 
-    const total = cards.length;
-
-    let targetIndex = Math.floor(total / 2);
+    let targetIndex = Math.floor(cards.length / 2);
     let currentIndex = targetIndex;
-    let velocity = 0;
-    let raf = null;
-
-    let pointerDown = false;
     let startX = 0;
+    let pointerDown = false;
     let activePointerId = null;
+    let raf = null;
     let lastMoveTime = 0;
 
     function clearDesktopInlineStyles() {
@@ -44,6 +38,13 @@
         card.style.removeProperty('background');
         card.style.removeProperty('backdrop-filter');
       });
+    }
+
+    function circularDiff(index, current, total) {
+      let diff = index - current;
+      if (diff > total / 2) diff -= total;
+      if (diff < -total / 2) diff += total;
+      return diff;
     }
 
     function cardWidth(index) {
@@ -72,29 +73,25 @@
         return;
       }
 
+      const total = cards.length;
       const centerX = viewport.clientWidth / 2;
-      const baseY = 12;
-
-      // Big radius = side cards actually rotate off-screen instead of sticking beside the center.
-      const wheelRadiusX = Math.min(viewport.clientWidth * 1.14, 440);
-      const wheelRadiusY = 132;
-      const maxVisible = 1.46;
+      const baseY = 18;
+      const spacing = Math.min(viewport.clientWidth * 0.66, 268);
+      const lift = 74;
 
       cards.forEach((card, index) => {
-        const diff = nearestCircularDiff(index, currentIndex, total);
+        const diff = circularDiff(index, currentIndex, total);
         const abs = Math.abs(diff);
+        const roundedAbs = Math.round(abs * 1000) / 1000;
         const w = cardWidth(index);
         const h = cardHeight(index);
-        const side = Math.sign(diff || 1);
 
         forceSolidBackground(card, index);
         card.style.width = Math.round(w) + 'px';
         card.style.height = h + 'px';
 
-        // Far cards are fully off-stage. This prevents sticky ghosts during a full loop.
-        if (abs > maxVisible) {
-          const hiddenX = centerX - w / 2 + side * viewport.clientWidth * 1.15;
-          card.style.transform = `translate3d(${hiddenX}px, ${baseY + 170}px, 0) rotate(${side * 26}deg) scale(.58)`;
+        if (roundedAbs > 2.02) {
+          card.style.transform = `translate3d(${centerX - w / 2}px, ${baseY + 130}px, 0) scale(.68) rotate(0deg)`;
           card.style.zIndex = '1';
           card.style.opacity = '0';
           card.style.filter = 'none';
@@ -102,35 +99,20 @@
           return;
         }
 
-        // Stronger arc: the first side position is mostly off-screen with only a peek visible.
-        const angle = diff * 1.1;
-        const xOffset = Math.sin(angle) * wheelRadiusX;
-        const yOffset = (1 - Math.cos(angle)) * wheelRadiusY + Math.pow(abs, 1.9) * 16;
-
-        const scale = 1 - Math.min(abs * 0.205, 0.36);
-        const rotate = diff * 23;
-
-        // No transparency on center/near cards. Only fade when nearly leaving the wheel.
-        let opacity = 1;
-        if (abs > 1.08) opacity = Math.max(0, 1 - (abs - 1.08) / 0.35);
-
-        const z = Math.round(100 - abs * 34);
-        const x = centerX - w / 2 + xOffset;
-        const y = baseY + yOffset;
+        const direction = diff < 0 ? -1 : diff > 0 ? 1 : 0;
+        const x = centerX - w / 2 + diff * spacing;
+        const y = baseY + Math.pow(abs, 1.55) * lift;
+        const rotate = direction * (12 + Math.min(abs, 1.4) * 7);
+        const scale = 1 - Math.min(abs * 0.155, 0.34);
+        const opacity = abs > 1.25 ? 0.42 : 1;
+        const z = Math.round(100 - abs * 25);
 
         card.style.transform = `translate3d(${x}px, ${y}px, 0) rotate(${rotate}deg) scale(${scale})`;
         card.style.zIndex = String(z);
         card.style.opacity = String(opacity);
         card.style.filter = 'none';
-        card.style.pointerEvents = abs < 0.55 ? 'auto' : 'none';
+        card.style.pointerEvents = abs > 1.7 ? 'none' : 'auto';
       });
-    }
-
-    function normalizeWhenResting() {
-      if (Math.abs(targetIndex) < total * 3) return;
-      const shift = Math.floor(targetIndex / total) * total;
-      targetIndex -= shift;
-      currentIndex -= shift;
     }
 
     function animate() {
@@ -140,31 +122,25 @@
         return;
       }
 
-      const distance = targetIndex - currentIndex;
+      let diff = targetIndex - currentIndex;
+      const total = cards.length;
+      if (diff > total / 2) diff -= total;
+      if (diff < -total / 2) diff += total;
 
-      velocity += distance * 0.07;
-      velocity *= 0.76;
-      currentIndex += velocity;
-
-      if (Math.abs(distance) < 0.0015 && Math.abs(velocity) < 0.0015) {
-        currentIndex = targetIndex;
-        velocity = 0;
-        render();
-        normalizeWhenResting();
-        raf = null;
-        return;
-      }
+      currentIndex += diff * 0.16;
+      if (Math.abs(diff) < 0.002) currentIndex = targetIndex;
 
       render();
-      raf = requestAnimationFrame(animate);
+
+      if (Math.abs(diff) > 0.002) raf = requestAnimationFrame(animate);
+      else raf = null;
     }
 
     function go(delta) {
       const now = Date.now();
-      if (now - lastMoveTime < 150) return;
+      if (now - lastMoveTime < 190) return;
       lastMoveTime = now;
-
-      targetIndex += delta;
+      targetIndex = mod(targetIndex + delta, cards.length);
       if (!raf) raf = requestAnimationFrame(animate);
     }
 
@@ -179,11 +155,9 @@
     viewport.addEventListener('pointerup', (event) => {
       if (!isMobileWheel() || !pointerDown) return;
       if (activePointerId !== null && event.pointerId !== activePointerId) return;
-
       pointerDown = false;
-      const delta = event.clientX - startX;
       activePointerId = null;
-
+      const delta = event.clientX - startX;
       if (Math.abs(delta) > 28) go(delta < 0 ? 1 : -1);
     });
 
@@ -200,7 +174,6 @@
     }, { passive: false });
 
     window.addEventListener('resize', render);
-
     render();
     setTimeout(render, 300);
     setTimeout(render, 700);
