@@ -202,19 +202,22 @@
   /* Insight card */
   .stage-scroll .float-card:nth-child(6) {
     align-items: stretch !important;
-    background:
-      radial-gradient(circle at 88% 14%, rgba(201,168,124,.18), transparent 32%),
-      linear-gradient(145deg, #24211e 0%, #12110f 62%, #0f0f10 100%) !important;
+    background: #171614 !important;
     color: #f3eee7 !important;
     border: 1px solid rgba(243,238,231,.12) !important;
     box-shadow:
       0 30px 76px rgba(0,0,0,.32),
       0 8px 22px rgba(0,0,0,.18),
-      inset 0 1px 0 rgba(255,255,255,.10) !important;
+      inset 0 1px 0 rgba(255,255,255,.08) !important;
   }
 
   .stage-scroll .float-card:nth-child(6)::before {
-    background: linear-gradient(90deg, transparent, rgba(243,238,231,.12), transparent);
+    background: rgba(243,238,231,.12);
+  }
+
+  .stage-scroll .float-card:nth-child(6)::after {
+    background: none !important;
+    opacity: 0 !important;
   }
 
   .stage-scroll .float-card:nth-child(6) .t-label,
