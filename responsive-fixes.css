@@ -38,7 +38,7 @@
   }
 }
 
-/* Mobile: stable controlled wheel. Cards are absolute; JS rotates them around an arc. */
+/* Mobile: stable controlled wheel. Cards are absolute; JS handles card transforms. */
 @media (max-width: 820px) {
   html,
   body,
@@ -124,6 +124,8 @@
     perspective: 1000px;
     touch-action: pan-y;
     cursor: grab;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
   }
 
   .stage-scroll:active {
@@ -142,7 +144,7 @@
     transform: none !important;
   }
 
-  .float-card {
+  .stage-scroll .float-card {
     position: absolute !important;
     top: 0 !important;
     left: 0 !important;
@@ -155,11 +157,22 @@
     box-shadow: var(--shadow-lg) !important;
     transform-origin: center bottom !important;
     will-change: transform, opacity;
-    transition: none !important;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
   }
 
-  .float-card:hover {
-    box-shadow: var(--shadow-xl) !important;
+  /* Kill the mobile card pop/press animation that fights swiping. */
+  .stage-scroll .float-card:hover,
+  .stage-scroll .float-card:active,
+  .stage-scroll .float-card:focus,
+  .stage-scroll .float-card:focus-visible {
+    box-shadow: var(--shadow-lg) !important;
+    outline: none !important;
+  }
+
+  .stage-scroll .float-card * {
+    pointer-events: none !important;
+    user-select: none;
   }
 
   .float-card .t-num-xl[style*="font-size: 76"] {
