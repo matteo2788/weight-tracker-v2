@@ -15,33 +15,15 @@
     stage.dataset.wheelReady = 'true';
 
     const total = cards.length;
-    let active = Math.floor(total / 2);
+    let position = Math.floor(total / 2);
+    let targetPosition = position;
+    let velocity = 0;
     let pointerDown = false;
     let startX = 0;
-    let currentX = 0;
+    let startPosition = position;
     let activePointerId = null;
-    let dragOffset = 0;
     let raf = null;
-    let lastMoveTime = 0;
-
-    function clearDesktopInlineStyles() {
-      cards.forEach((card) => {
-        card.style.removeProperty('width');
-        card.style.removeProperty('height');
-        card.style.removeProperty('min-height');
-        card.style.removeProperty('overflow');
-        card.style.removeProperty('opacity');
-        card.style.removeProperty('filter');
-        card.style.removeProperty('pointer-events');
-        card.style.removeProperty('z-index');
-        card.style.removeProperty('--wheel-z');
-        card.style.removeProperty('transform');
-        card.style.removeProperty('--wheel-transform');
-        card.style.removeProperty('background');
-        card.style.removeProperty('backdrop-filter');
-        card.style.removeProperty('transition');
-      });
-    }
+    let lastWheelMove = 0;
 
     function circularDiff(index, current, total) {
       let diff = index - current;
@@ -65,25 +47,35 @@
       card.style.background = isDark ? '#171614' : '#fffaf2';
     }
 
-    function applyTransform(card, transform) {
+    function setCard(card, transform, opacity, z, pointer) {
       card.style.setProperty('--wheel-transform', transform);
-      card.style.transform = transform;
-    }
-
-    function applyZ(card, z) {
       card.style.setProperty('--wheel-z', String(z));
+      card.style.transform = transform;
+      card.style.opacity = String(opacity);
       card.style.zIndex = String(z);
+      card.style.pointerEvents = pointer;
     }
 
-    function requestRender(isDragging) {
-      if (raf) return;
-      raf = requestAnimationFrame(() => {
-        raf = null;
-        render(isDragging);
+    function clearDesktopInlineStyles() {
+      cards.forEach((card) => {
+        card.style.removeProperty('width');
+        card.style.removeProperty('height');
+        card.style.removeProperty('min-height');
+        card.style.removeProperty('overflow');
+        card.style.removeProperty('opacity');
+        card.style.removeProperty('filter');
+        card.style.removeProperty('pointer-events');
+        card.style.removeProperty('z-index');
+        card.style.removeProperty('--wheel-z');
+        card.style.removeProperty('transform');
+        card.style.removeProperty('--wheel-transform');
+        card.style.removeProperty('background');
+        card.style.removeProperty('backdrop-filter');
+        card.style.removeProperty('transition');
       });
     }
 
-    function render(isDragging) {
+    function render() {
       if (!isMobileWheel()) {
         clearDesktopInlineStyles();
         return;
@@ -94,10 +86,9 @@
       const sideX = Math.min(viewport.clientWidth * 0.62, 250);
       const farX = Math.min(viewport.clientWidth * 0.95, 380);
       const size = cardSize();
-      const displayIndex = active + dragOffset;
 
       cards.forEach((card, index) => {
-        const diff = circularDiff(index, displayIndex, total);
+        const diff = circularDiff(index, position, total);
         const abs = Math.abs(diff);
         const w = size.width;
         const h = size.height;
@@ -107,9 +98,7 @@
         card.style.height = h + 'px';
         card.style.minHeight = h + 'px';
         card.style.overflow = 'hidden';
-        card.style.transition = isDragging
-          ? 'none'
-          : 'transform 260ms cubic-bezier(.2,.9,.25,1), opacity 200ms ease';
+        card.style.transition = 'none';
         card.style.filter = 'none';
 
         let x;
@@ -140,45 +129,74 @@
         }
 
         const transform = `translate3d(${x}px, ${y}px, 0) rotate(${rotate}deg) scale(${scale})`;
-        applyTransform(card, transform);
-        card.style.opacity = String(opacity);
-        applyZ(card, z);
-        card.style.pointerEvents = pointer;
+        setCard(card, transform, opacity, z, pointer);
       });
     }
 
-    function settle(moveBy) {
-      const now = Date.now();
-      if (now - lastMoveTime < 45) return;
-      lastMoveTime = now;
+    function normalizePosition() {
+      if (Math.abs(position) < total * 4 && Math.abs(targetPosition) < total * 4) return;
+      const shift = Math.round(position / total) * total;
+      position -= shift;
+      targetPosition -= shift;
+      startPosition -= shift;
+    }
 
-      active = ((active + moveBy) % total + total) % total;
-      dragOffset = 0;
-      render(false);
+    function animateToTarget() {
+      if (!isMobileWheel()) {
+        render();
+        raf = null;
+        return;
+      }
+
+      const distance = targetPosition - position;
+      velocity += distance * 0.10;
+      velocity *= 0.72;
+      position += velocity;
+
+      if (Math.abs(distance) < 0.001 && Math.abs(velocity) < 0.001) {
+        position = targetPosition;
+        velocity = 0;
+        render();
+        normalizePosition();
+        raf = null;
+        return;
+      }
+
+      render();
+      raf = requestAnimationFrame(animateToTarget);
+    }
+
+    function startAnimation() {
+      if (raf) cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(animateToTarget);
     }
 
     viewport.addEventListener('pointerdown', (event) => {
       if (!isMobileWheel()) return;
       pointerDown = true;
       startX = event.clientX;
-      currentX = event.clientX;
-      dragOffset = 0;
+      startPosition = position;
+      targetPosition = position;
+      velocity = 0;
       activePointerId = event.pointerId;
+      if (raf) {
+        cancelAnimationFrame(raf);
+        raf = null;
+      }
       try { viewport.setPointerCapture(event.pointerId); } catch (e) {}
-      render(true);
+      render();
     });
 
     viewport.addEventListener('pointermove', (event) => {
       if (!isMobileWheel() || !pointerDown) return;
       if (activePointerId !== null && event.pointerId !== activePointerId) return;
       event.preventDefault();
-      currentX = event.clientX;
-      const delta = currentX - startX;
+      const delta = event.clientX - startX;
       const dragDistance = Math.min(viewport.clientWidth * 0.55, 220);
-
-      // Continuous drag: no magnetic clamp while your finger is moving.
-      dragOffset = -delta / dragDistance;
-      requestRender(true);
+      position = startPosition - delta / dragDistance;
+      targetPosition = position;
+      velocity = 0;
+      render();
     }, { passive: false });
 
     viewport.addEventListener('pointerup', (event) => {
@@ -186,34 +204,32 @@
       if (activePointerId !== null && event.pointerId !== activePointerId) return;
       pointerDown = false;
       activePointerId = null;
-      const delta = event.clientX - startX;
-      const dragDistance = Math.min(viewport.clientWidth * 0.55, 220);
-      const rawOffset = -delta / dragDistance;
-      const moveBy = Math.abs(rawOffset) > 0.18 || Math.abs(delta) > 34
-        ? Math.round(rawOffset)
-        : 0;
-      dragOffset = 0;
-      settle(moveBy);
+      targetPosition = Math.round(position);
+      startAnimation();
     });
 
     viewport.addEventListener('pointercancel', () => {
       pointerDown = false;
       activePointerId = null;
-      dragOffset = 0;
-      render(false);
+      targetPosition = Math.round(position);
+      startAnimation();
     });
 
     viewport.addEventListener('wheel', (event) => {
       if (!isMobileWheel()) return;
       if (Math.abs(event.deltaX) + Math.abs(event.deltaY) < 12) return;
       event.preventDefault();
-      settle((event.deltaX || event.deltaY) > 0 ? 1 : -1);
+      const now = Date.now();
+      if (now - lastWheelMove < 120) return;
+      lastWheelMove = now;
+      targetPosition = Math.round(targetPosition + ((event.deltaX || event.deltaY) > 0 ? 1 : -1));
+      startAnimation();
     }, { passive: false });
 
-    window.addEventListener('resize', () => render(false));
-    render(false);
-    setTimeout(() => render(false), 300);
-    setTimeout(() => render(false), 700);
+    window.addEventListener('resize', render);
+    render();
+    setTimeout(render, 300);
+    setTimeout(render, 700);
   }
 
   window.addEventListener('load', setupWheel);
