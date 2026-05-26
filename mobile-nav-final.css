@@ -19,18 +19,113 @@
     content: none !important;
   }
 
-  /* Mobile/PWA fix: remove the top nav from the hero screen. The iOS status area is not reliable for web headers. */
+  /* Minimal mobile app header: app name left, menu button right, no bulky nav/actions. */
   .nav {
+    display: block !important;
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 14px 0 8px !important;
+    background: #F4F0E8 !important;
+    border-bottom: 0 !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+    z-index: 20 !important;
+  }
+
+  .nav .container {
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+  }
+
+  .nav-inner {
+    height: 42px !important;
+    min-height: 42px !important;
+    max-height: 42px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    overflow: visible !important;
+  }
+
+  .logo {
+    display: block !important;
+    font-size: 25px !important;
+    line-height: 1 !important;
+    transform: none !important;
+    position: relative !important;
+  }
+
+  .nav-links {
     display: none !important;
   }
 
+  .nav-right {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0 !important;
+    transform: none !important;
+    position: relative !important;
+  }
+
+  .nav-right .btn,
+  .nav-right .avatar,
+  .nav-right .bell,
+  .nav-right .search,
+  .nav-right > button:not(.icon-btn) {
+    display: none !important;
+  }
+
+  .icon-btn {
+    display: inline-flex !important;
+    width: 44px !important;
+    height: 44px !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 999px !important;
+    background: rgba(255, 255, 255, .58) !important;
+    border: 1px solid rgba(23, 22, 20, .12) !important;
+    box-shadow: 0 10px 24px rgba(18, 16, 12, .08) !important;
+    color: #171614 !important;
+    transform: none !important;
+    position: relative !important;
+  }
+
+  .icon-btn svg {
+    width: 20px !important;
+    height: 20px !important;
+  }
+
   .hero {
-    padding-top: 48px !important;
+    padding-top: 34px !important;
   }
 }
 
 @media (max-width: 480px) {
+  .nav {
+    padding: 12px 0 6px !important;
+  }
+
+  .nav .container {
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+  }
+
+  .nav-inner {
+    height: 40px !important;
+    min-height: 40px !important;
+    max-height: 40px !important;
+  }
+
+  .logo {
+    font-size: 24px !important;
+  }
+
   .hero {
-    padding-top: 42px !important;
+    padding-top: 30px !important;
   }
 }
