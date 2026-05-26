@@ -11,11 +11,13 @@
     const cards = Array.from(stage.querySelectorAll('.float-card'));
     if (!cards.length) return;
 
-    if (stage.dataset.wheelReady === 'true') return;
-    stage.dataset.wheelReady = 'true';
+    if (stage.dataset.wheelMounted === 'true') return;
+    stage.dataset.wheelMounted = 'true';
 
     const total = cards.length;
-    let position = Math.floor(total / 2);
+
+    // Card index 0 is the Today / logged weight card. Always open here.
+    let position = 0;
     let targetPosition = position;
     let velocity = 0;
     let pointerDown = false;
@@ -57,6 +59,7 @@
     }
 
     function clearDesktopInlineStyles() {
+      stage.classList.remove('wheel-ready');
       cards.forEach((card) => {
         card.style.removeProperty('width');
         card.style.removeProperty('height');
@@ -141,6 +144,9 @@
         const transform = `translate3d(${x}px, ${y}px, 0) rotate(${rotate}deg) scale(${scale})`;
         setCard(card, transform, opacity, z, pointer);
       });
+
+      // Reveal only after all cards have their correct first position.
+      stage.classList.add('wheel-ready');
     }
 
     function animateToTarget() {
