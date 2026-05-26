@@ -20,7 +20,6 @@
 
     let targetIndex = Math.floor(cards.length / 2);
     let currentIndex = targetIndex;
-
     let startX = 0;
     let dragging = false;
     let raf = null;
@@ -31,9 +30,11 @@
         card.style.removeProperty('height');
         card.style.removeProperty('opacity');
         card.style.removeProperty('filter');
-        card.style.removeProperty('pointerEvents');
-        card.style.removeProperty('zIndex');
+        card.style.removeProperty('pointer-events');
+        card.style.removeProperty('z-index');
         card.style.removeProperty('transform');
+        card.style.removeProperty('background');
+        card.style.removeProperty('backdrop-filter');
       });
     }
 
@@ -46,15 +47,22 @@
 
     function cardWidth(index) {
       const vw = window.innerWidth;
-      if (index === 0) return Math.min(vw * 0.82, 326);
-      if (index === 5) return Math.min(vw * 0.78, 300);
-      return Math.min(vw * 0.72, 286);
+      if (index === 0) return Math.min(vw * 0.86, 342);
+      if (index === 5) return Math.min(vw * 0.82, 322);
+      return Math.min(vw * 0.80, 316);
     }
 
     function cardHeight(index) {
-      if (index === 0) return 204;
-      if (index === 5) return 154;
-      return 176;
+      if (index === 0) return 214;
+      if (index === 5) return 164;
+      return 184;
+    }
+
+    function forceSolidBackground(card, index) {
+      const isDark = index === 5 || card.className.includes('dark') || card.textContent.toLowerCase().includes('insight');
+      card.style.backdropFilter = 'none';
+      if (isDark) card.style.background = '#171614';
+      else card.style.background = '#fffaf2';
     }
 
     function render() {
@@ -65,48 +73,48 @@
 
       const total = cards.length;
       const centerX = viewport.clientWidth / 2;
-      const wheelRadiusX = Math.min(viewport.clientWidth * 0.34, 130);
-      const wheelRadiusY = 72;
       const baseY = 18;
+      const spacing = Math.min(viewport.clientWidth * 0.66, 268);
+      const lift = 74;
 
       cards.forEach((card, index) => {
         const diff = circularDiff(index, currentIndex, total);
+        const abs = Math.abs(diff);
+        const roundedAbs = Math.round(abs * 1000) / 1000;
+        const w = cardWidth(index);
+        const h = cardHeight(index);
 
-        // Hide really far cards so the wheel stays clean
-        if (Math.abs(diff) > 2.4) {
+        forceSolidBackground(card, index);
+        card.style.width = Math.round(w) + 'px';
+        card.style.height = h + 'px';
+
+        if (roundedAbs > 2.02) {
+          card.style.transform = `translate3d(${centerX - w / 2}px, ${baseY + 130}px, 0) scale(.68) rotate(0deg)`;
+          card.style.zIndex = '1';
           card.style.opacity = '0';
+          card.style.filter = 'none';
           card.style.pointerEvents = 'none';
           return;
         }
 
-        const w = cardWidth(index);
-        const h = cardHeight(index);
+        const direction = diff < 0 ? -1 : diff > 0 ? 1 : 0;
+        const sidePower = Math.min(abs, 1.35);
+        const x = centerX - w / 2 + diff * spacing;
+        const y = baseY + Math.pow(abs, 1.55) * lift;
+        const rotate = direction * (12 + Math.min(abs, 1.4) * 7);
+        const scale = 1 - Math.min(abs * 0.155, 0.34);
 
-        // Turn diff into an arc angle
-        // center = 0, left/right move around the wheel
-        const angle = diff * 0.72;
+        let opacity = 1;
+        if (abs > 1.25) opacity = 0.42;
+        else opacity = 1;
 
-        // Arc positions
-        const xOffset = Math.sin(angle) * wheelRadiusX;
-        const yOffset = (1 - Math.cos(angle)) * wheelRadiusY;
+        const z = Math.round(100 - abs * 25);
 
-        // Better wheel feel
-        const scale = 1 - Math.min(Math.abs(diff) * 0.12, 0.28);
-        const rotate = diff * -13;
-        const opacity = 1 - Math.min(Math.abs(diff) * 0.22, 0.55);
-        const blur = Math.abs(diff) > 1.7 ? 1.1 : 0;
-        const z = Math.round(100 - Math.abs(diff) * 20);
-
-        const x = centerX - w / 2 + xOffset;
-        const y = baseY + yOffset;
-
-        card.style.width = Math.round(w) + 'px';
-        card.style.height = h + 'px';
         card.style.transform = `translate3d(${x}px, ${y}px, 0) rotate(${rotate}deg) scale(${scale})`;
         card.style.zIndex = String(z);
         card.style.opacity = String(opacity);
-        card.style.filter = blur ? `blur(${blur}px)` : 'none';
-        card.style.pointerEvents = 'auto';
+        card.style.filter = 'none';
+        card.style.pointerEvents = abs > 1.7 ? 'none' : 'auto';
       });
     }
 
@@ -119,23 +127,16 @@
 
       let diff = targetIndex - currentIndex;
       const total = cards.length;
-
       if (diff > total / 2) diff -= total;
       if (diff < -total / 2) diff += total;
 
-      currentIndex += diff * 0.16;
-
-      if (Math.abs(diff) < 0.001) {
-        currentIndex = targetIndex;
-      }
+      currentIndex += diff * 0.18;
+      if (Math.abs(diff) < 0.002) currentIndex = targetIndex;
 
       render();
 
-      if (Math.abs(diff) > 0.001) {
-        raf = requestAnimationFrame(animate);
-      } else {
-        raf = null;
-      }
+      if (Math.abs(diff) > 0.002) raf = requestAnimationFrame(animate);
+      else raf = null;
     }
 
     function go(delta) {
@@ -143,27 +144,19 @@
       if (!raf) raf = requestAnimationFrame(animate);
     }
 
-    viewport.addEventListener(
-      'touchstart',
-      (event) => {
-        if (!isMobileWheel()) return;
-        dragging = true;
-        startX = event.touches[0].clientX;
-      },
-      { passive: true }
-    );
+    viewport.addEventListener('touchstart', (event) => {
+      if (!isMobileWheel()) return;
+      dragging = true;
+      startX = event.touches[0].clientX;
+    }, { passive: true });
 
-    viewport.addEventListener(
-      'touchend',
-      (event) => {
-        if (!isMobileWheel() || !dragging) return;
-        dragging = false;
-        const endX = event.changedTouches[0].clientX;
-        const delta = endX - startX;
-        if (Math.abs(delta) > 28) go(delta < 0 ? 1 : -1);
-      },
-      { passive: true }
-    );
+    viewport.addEventListener('touchend', (event) => {
+      if (!isMobileWheel() || !dragging) return;
+      dragging = false;
+      const endX = event.changedTouches[0].clientX;
+      const delta = endX - startX;
+      if (Math.abs(delta) > 26) go(delta < 0 ? 1 : -1);
+    }, { passive: true });
 
     viewport.addEventListener('pointerdown', (event) => {
       if (!isMobileWheel()) return;
@@ -175,13 +168,17 @@
       if (!isMobileWheel() || !dragging) return;
       dragging = false;
       const delta = event.clientX - startX;
-      if (Math.abs(delta) > 28) go(delta < 0 ? 1 : -1);
+      if (Math.abs(delta) > 26) go(delta < 0 ? 1 : -1);
     });
 
-    window.addEventListener('resize', () => {
-      render();
-    });
+    viewport.addEventListener('wheel', (event) => {
+      if (!isMobileWheel()) return;
+      if (Math.abs(event.deltaX) + Math.abs(event.deltaY) < 10) return;
+      event.preventDefault();
+      go((event.deltaX || event.deltaY) > 0 ? 1 : -1);
+    }, { passive: false });
 
+    window.addEventListener('resize', render);
     render();
     setTimeout(render, 300);
     setTimeout(render, 700);
