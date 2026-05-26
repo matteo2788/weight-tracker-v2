@@ -30,6 +30,7 @@
         card.style.removeProperty('pointer-events');
         card.style.removeProperty('z-index');
         card.style.removeProperty('transform');
+        card.style.removeProperty('--wheel-transform');
         card.style.removeProperty('background');
         card.style.removeProperty('backdrop-filter');
         card.style.removeProperty('transition');
@@ -61,6 +62,11 @@
       const isDark = index === 5 || card.className.includes('dark') || text.includes('insight');
       card.style.backdropFilter = 'none';
       card.style.background = isDark ? '#171614' : '#fffaf2';
+    }
+
+    function applyTransform(card, transform) {
+      card.style.setProperty('--wheel-transform', transform);
+      card.style.transform = transform;
     }
 
     function render() {
@@ -136,7 +142,8 @@
           pointer = 'none';
         }
 
-        card.style.transform = `translate3d(${x}px, ${y}px, 0) rotate(${rotate}deg) scale(${scale})`;
+        const transform = `translate3d(${x}px, ${y}px, 0) rotate(${rotate}deg) scale(${scale})`;
+        applyTransform(card, transform);
         card.style.opacity = String(opacity);
         card.style.zIndex = String(z);
         card.style.pointerEvents = pointer;
