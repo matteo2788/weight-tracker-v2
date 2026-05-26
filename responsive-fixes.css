@@ -38,7 +38,7 @@
   }
 }
 
-/* Tablet/mobile: swipeable overlapping ribbon with an arch feeling. */
+/* Mobile: use the exact desktop card composition, scaled down to fit. */
 @media (max-width: 820px) {
   html,
   body,
@@ -115,103 +115,49 @@
   }
 
   .stage-scroll {
-    overflow-x: auto !important;
-    overflow-y: visible !important;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    margin: 34px -20px 0 !important;
-    padding: 42px 20px 58px !important;
-    width: auto !important;
-    max-width: none !important;
-    scroll-snap-type: x proximity;
-    overscroll-behavior-x: contain;
-  }
-
-  .stage-scroll::-webkit-scrollbar {
-    display: none;
+    overflow: visible !important;
+    margin: 36px auto 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: 190px !important;
   }
 
   .stage {
     position: relative !important;
-    width: max-content !important;
-    min-width: 0 !important;
+    width: 1100px !important;
     max-width: none !important;
-    height: 330px !important;
+    height: 460px !important;
     margin: 0 !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: 0 !important;
+    left: 50% !important;
+    display: block !important;
     overflow: visible !important;
-    transform: none !important;
-    padding-left: 22px;
-    padding-right: 90px;
+    transform: translateX(-50%) scale(.39) !important;
+    transform-origin: top center !important;
   }
 
   .float-card {
-    position: relative !important;
-    top: auto !important;
-    left: auto !important;
-    right: auto !important;
-    bottom: auto !important;
-    margin: 0 !important;
-    margin-left: -78px !important;
-    flex: 0 0 min(78vw, 315px) !important;
-    width: min(78vw, 315px) !important;
-    min-height: 178px !important;
+    position: absolute !important;
     max-width: none !important;
-    border-radius: 24px !important;
-    box-shadow: var(--shadow-lg) !important;
-    scroll-snap-align: center;
-  }
-
-  .stage > .float-card:first-child {
-    margin-left: 0 !important;
-  }
-
-  .float-card:hover {
-    transform: none !important;
-  }
-
-  /* Arch rhythm: center card higher, supporting cards lower/behind. */
-  .stage > .float-card:nth-child(1) {
-    transform: translateY(-36px) rotate(-2deg) !important;
-    z-index: 6 !important;
-  }
-
-  .stage > .float-card:nth-child(2) {
-    transform: translateY(8px) rotate(-6deg) !important;
-    z-index: 4 !important;
-  }
-
-  .stage > .float-card:nth-child(3) {
-    transform: translateY(-8px) rotate(7deg) !important;
-    z-index: 3 !important;
-  }
-
-  .stage > .float-card:nth-child(4) {
-    transform: translateY(96px) rotate(-5deg) !important;
-    z-index: 2 !important;
-  }
-
-  .stage > .float-card:nth-child(5) {
-    transform: translateY(82px) rotate(6deg) !important;
-    z-index: 3 !important;
-  }
-
-  .stage > .float-card:nth-child(6) {
-    transform: translateY(110px) rotate(1.5deg) !important;
-    background: var(--ink) !important;
-    z-index: 5 !important;
   }
 
   .float-card .t-num-xl[style*="font-size: 76"] {
-    font-size: clamp(58px, 18vw, 74px) !important;
+    font-size: 76px !important;
   }
 
   .section {
     padding-top: 54px;
     padding-bottom: 54px;
   }
+}
+
+@media (max-width: 700px) {
+  .stage-scroll { height: 178px !important; }
+  .stage { transform: translateX(-50%) scale(.36) !important; }
+}
+
+@media (max-width: 560px) {
+  .stage-scroll { height: 162px !important; }
+  .stage { transform: translateX(-50%) scale(.33) !important; }
 }
 
 /* Smaller phones */
@@ -246,31 +192,16 @@
   }
 
   .stage-scroll {
-    margin-left: -16px !important;
-    margin-right: -16px !important;
-    padding-left: 16px !important;
-    padding-right: 16px !important;
+    height: 152px !important;
+    margin-top: 34px !important;
   }
 
   .stage {
-    height: 310px !important;
-    padding-left: 18px;
-    padding-right: 80px;
+    transform: translateX(-50%) scale(.31) !important;
   }
+}
 
-  .float-card {
-    flex-basis: 78vw !important;
-    width: 78vw !important;
-    min-height: 168px !important;
-    margin-left: -72px !important;
-    padding: 20px !important;
-  }
-
-  .float-card .t-num-xl[style*="font-size: 76"] {
-    font-size: 58px !important;
-  }
-
-  .stage svg {
-    max-width: 100%;
-  }
+@media (max-width: 390px) {
+  .stage-scroll { height: 145px !important; }
+  .stage { transform: translateX(-50%) scale(.29) !important; }
 }
