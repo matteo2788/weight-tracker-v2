@@ -22,8 +22,6 @@
 
     const total = cards.length;
 
-    // Start with the middle card centered. This stays continuous forever,
-    // so looping from last card back to first card does not jump/glitch.
     let targetIndex = Math.floor(total / 2);
     let currentIndex = targetIndex;
     let velocity = 0;
@@ -76,24 +74,27 @@
 
       const centerX = viewport.clientWidth / 2;
       const baseY = 12;
-      const wheelRadiusX = Math.min(viewport.clientWidth * 0.86, 335);
-      const wheelRadiusY = 118;
-      const maxVisible = 1.72;
+
+      // Big radius = side cards actually rotate off-screen instead of sticking beside the center.
+      const wheelRadiusX = Math.min(viewport.clientWidth * 1.14, 440);
+      const wheelRadiusY = 132;
+      const maxVisible = 1.46;
 
       cards.forEach((card, index) => {
         const diff = nearestCircularDiff(index, currentIndex, total);
         const abs = Math.abs(diff);
         const w = cardWidth(index);
         const h = cardHeight(index);
+        const side = Math.sign(diff || 1);
 
         forceSolidBackground(card, index);
         card.style.width = Math.round(w) + 'px';
         card.style.height = h + 'px';
 
-        // Far cards are hidden completely. Only the centered card and side peeks show.
+        // Far cards are fully off-stage. This prevents sticky ghosts during a full loop.
         if (abs > maxVisible) {
-          const hiddenX = centerX - w / 2 + Math.sign(diff || 1) * viewport.clientWidth * 0.85;
-          card.style.transform = `translate3d(${hiddenX}px, ${baseY + 150}px, 0) rotate(${Math.sign(diff || 1) * 22}deg) scale(.64)`;
+          const hiddenX = centerX - w / 2 + side * viewport.clientWidth * 1.15;
+          card.style.transform = `translate3d(${hiddenX}px, ${baseY + 170}px, 0) rotate(${side * 26}deg) scale(.58)`;
           card.style.zIndex = '1';
           card.style.opacity = '0';
           card.style.filter = 'none';
@@ -101,19 +102,19 @@
           return;
         }
 
-        // Real arc math: cards travel around a lower half-wheel.
-        const angle = diff * 0.92;
+        // Stronger arc: the first side position is mostly off-screen with only a peek visible.
+        const angle = diff * 1.1;
         const xOffset = Math.sin(angle) * wheelRadiusX;
-        const yOffset = (1 - Math.cos(angle)) * wheelRadiusY + Math.pow(abs, 1.7) * 14;
+        const yOffset = (1 - Math.cos(angle)) * wheelRadiusY + Math.pow(abs, 1.9) * 16;
 
-        const scale = 1 - Math.min(abs * 0.18, 0.34);
-        const rotate = diff * 18;
+        const scale = 1 - Math.min(abs * 0.205, 0.36);
+        const rotate = diff * 23;
 
-        // Center and near cards stay solid. Only almost-hidden cards fade.
+        // No transparency on center/near cards. Only fade when nearly leaving the wheel.
         let opacity = 1;
-        if (abs > 1.22) opacity = Math.max(0, 1 - (abs - 1.22) / 0.5);
+        if (abs > 1.08) opacity = Math.max(0, 1 - (abs - 1.08) / 0.35);
 
-        const z = Math.round(100 - abs * 30);
+        const z = Math.round(100 - abs * 34);
         const x = centerX - w / 2 + xOffset;
         const y = baseY + yOffset;
 
@@ -141,9 +142,8 @@
 
       const distance = targetIndex - currentIndex;
 
-      // Smooth spring animation: less snap, less flicker, cleaner lap-around.
-      velocity += distance * 0.075;
-      velocity *= 0.78;
+      velocity += distance * 0.07;
+      velocity *= 0.76;
       currentIndex += velocity;
 
       if (Math.abs(distance) < 0.0015 && Math.abs(velocity) < 0.0015) {
@@ -161,7 +161,7 @@
 
     function go(delta) {
       const now = Date.now();
-      if (now - lastMoveTime < 160) return;
+      if (now - lastMoveTime < 150) return;
       lastMoveTime = now;
 
       targetIndex += delta;
