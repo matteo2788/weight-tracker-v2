@@ -1,4 +1,4 @@
-/* Final mobile nav fix — loaded last so it beats earlier sticky/safe-area rules */
+/* Final mobile top treatment — loaded last */
 
 @media (max-width: 820px) {
   html,
@@ -19,80 +19,18 @@
     content: none !important;
   }
 
-  /* App-style fixed header. It paints from the very top, including the iPhone safe area. */
+  /* Mobile/PWA fix: remove the top nav from the hero screen. The iOS status area is not reliable for web headers. */
   .nav {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    height: calc(60px + env(safe-area-inset-top, 0px)) !important;
-    min-height: calc(60px + env(safe-area-inset-top, 0px)) !important;
-    padding: env(safe-area-inset-top, 0px) 0 0 !important;
-    margin: 0 !important;
-    overflow: visible !important;
-    transform: none !important;
-    background: #F4F0E8 !important;
-    border-bottom: 1px solid rgba(23, 22, 20, .08) !important;
-    box-shadow: 0 1px 0 rgba(23, 22, 20, .04) !important;
-    z-index: 9999 !important;
+    display: none !important;
   }
 
-  .nav .container {
-    padding-left: 20px !important;
-    padding-right: 20px !important;
-    height: 60px !important;
-  }
-
-  .nav-inner {
-    height: 60px !important;
-    min-height: 60px !important;
-    max-height: 60px !important;
-    overflow: visible !important;
-    display: flex !important;
-    align-items: center !important;
-  }
-
-  .logo,
-  .nav-right,
-  .nav-links,
-  .btn,
-  .avatar,
-  .icon-btn {
-    transform: none !important;
-    position: relative !important;
-    top: auto !important;
-    bottom: auto !important;
-  }
-
-  .logo {
-    line-height: 1 !important;
-  }
-
-  /* Push content below the fixed header instead of letting the header create a blank page-flow gap. */
   .hero {
-    padding-top: calc(104px + env(safe-area-inset-top, 0px)) !important;
+    padding-top: 48px !important;
   }
 }
 
 @media (max-width: 480px) {
-  .nav {
-    height: calc(58px + env(safe-area-inset-top, 0px)) !important;
-    min-height: calc(58px + env(safe-area-inset-top, 0px)) !important;
-  }
-
-  .nav .container {
-    padding-left: 16px !important;
-    padding-right: 16px !important;
-    height: 58px !important;
-  }
-
-  .nav-inner {
-    height: 58px !important;
-    min-height: 58px !important;
-    max-height: 58px !important;
-  }
-
   .hero {
-    padding-top: calc(96px + env(safe-area-inset-top, 0px)) !important;
+    padding-top: 42px !important;
   }
 }
