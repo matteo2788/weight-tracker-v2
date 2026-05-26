@@ -6,6 +6,13 @@ const App = () => {
   const [logOpen, setLogOpen] = useStateApp(false);
   const [editingEntry, setEditingEntry] = useStateApp(null);
   const [menuOpen, setMenuOpen] = useStateApp(false);
+  const [dataVersion, setDataVersion] = useStateApp(0);
+
+  useEffectApp(() => {
+    const refresh = () => setDataVersion(v => v + 1);
+    window.addEventListener("drift:data-updated", refresh);
+    return () => window.removeEventListener("drift:data-updated", refresh);
+  }, []);
 
   const navItems = [
     { id: "dashboard", label: "Dashboard" },
@@ -22,8 +29,14 @@ const App = () => {
 
   const goTo = (id) => { setScreen(id); setMenuOpen(false); window.scrollTo(0, 0); };
 
+  const handleSaveEntry = (entry) => {
+    if (!window.DriftStore || typeof window.DriftStore.saveEntry !== "function") return;
+    window.DriftStore.saveEntry(entry);
+    setDataVersion(v => v + 1);
+  };
+
   return (
-    <div className="shell" data-screen-label={screen}>
+    <div className="shell" data-screen-label={screen} data-data-version={dataVersion}>
       <header className="nav">
         <div className="container nav-inner">
           <button className="logo" onClick={() => goTo("dashboard")} aria-label="Drift home">
@@ -78,14 +91,14 @@ const App = () => {
             </button>
           ))}
         </div>
-        {menuOpen && <div className="nav-scrim" onClick={() => setMenuOpen(false)}/>}
+        {menuOpen && <div className="nav-scrim" onClick={() => setMenuOpen(false)}/>} 
       </header>
 
-      <main key={screen}>
-        {screen === "dashboard" && <Drift.Dashboard onNav={setScreen} onLog={() => openLog()}/>}
-        {screen === "trends" && <Drift.TrendsScreen onNav={setScreen}/>}
-        {screen === "history" && <Drift.HistoryScreen onNav={setScreen} onEdit={openLog}/>}
-        {screen === "insights" && <Drift.InsightsScreen onNav={setScreen}/>}
+      <main key={`${screen}-${dataVersion}`}>
+        {screen === "dashboard" && <Drift.Dashboard onNav={goTo} onLog={() => openLog()}/>} 
+        {screen === "trends" && <Drift.TrendsScreen onNav={goTo}/>} 
+        {screen === "history" && <Drift.HistoryScreen onNav={goTo} onEdit={openLog}/>} 
+        {screen === "insights" && <Drift.InsightsScreen onNav={goTo}/>} 
         {screen === "settings" && <Drift.SettingsScreen/>}
       </main>
 
@@ -99,7 +112,7 @@ const App = () => {
             <span>v 2.4</span>
             <span>{window.fmtDateLong(window.DriftData.today)}</span>
             <span>·</span>
-            <span>Synced 2m ago</span>
+            <span>Saved locally</span>
           </div>
         </div>
       </footer>
@@ -107,7 +120,7 @@ const App = () => {
       <Drift.LogWeightModal
         open={logOpen}
         onClose={() => { setLogOpen(false); setEditingEntry(null); }}
-        onSave={(d) => { /* would persist; data is read-only demo */ }}
+        onSave={handleSaveEntry}
         initial={editingEntry}
       />
     </div>
