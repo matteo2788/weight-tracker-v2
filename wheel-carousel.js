@@ -25,6 +25,8 @@
       cards.forEach((card) => {
         card.style.removeProperty('width');
         card.style.removeProperty('height');
+        card.style.removeProperty('min-height');
+        card.style.removeProperty('overflow');
         card.style.removeProperty('opacity');
         card.style.removeProperty('filter');
         card.style.removeProperty('pointer-events');
@@ -44,17 +46,12 @@
       return Math.round(diff);
     }
 
-    function cardWidth(index) {
+    function cardSize() {
       const vw = window.innerWidth;
-      if (index === 0) return Math.min(vw * 0.86, 342);
-      if (index === 5) return Math.min(vw * 0.82, 322);
-      return Math.min(vw * 0.80, 316);
-    }
-
-    function cardHeight(index) {
-      if (index === 0) return 214;
-      if (index === 5) return 164;
-      return 184;
+      return {
+        width: Math.min(vw * 0.82, 326),
+        height: 206
+      };
     }
 
     function forceSolidBackground(card, index) {
@@ -76,19 +73,22 @@
       }
 
       const centerX = viewport.clientWidth / 2;
-      const centerY = 18;
+      const centerY = 22;
       const sideX = Math.min(viewport.clientWidth * 0.62, 250);
       const farX = Math.min(viewport.clientWidth * 0.95, 380);
+      const size = cardSize();
 
       cards.forEach((card, index) => {
         const slot = slotFor(index);
         const abs = Math.abs(slot);
-        const w = cardWidth(index);
-        const h = cardHeight(index);
+        const w = size.width;
+        const h = size.height;
 
         forceSolidBackground(card, index);
         card.style.width = Math.round(w) + 'px';
         card.style.height = h + 'px';
+        card.style.minHeight = h + 'px';
+        card.style.overflow = 'hidden';
         card.style.transition = 'transform 430ms cubic-bezier(.22,1,.36,1), opacity 260ms ease';
         card.style.filter = 'none';
 
@@ -102,7 +102,7 @@
 
         if (slot === -1) {
           x = centerX - w / 2 - sideX;
-          y = centerY + 84;
+          y = centerY + 82;
           scale = 0.78;
           rotate = -22;
           opacity = 1;
@@ -110,7 +110,7 @@
           pointer = 'none';
         } else if (slot === 1) {
           x = centerX - w / 2 + sideX;
-          y = centerY + 84;
+          y = centerY + 82;
           scale = 0.78;
           rotate = 22;
           opacity = 1;
@@ -118,7 +118,7 @@
           pointer = 'none';
         } else if (slot === -2) {
           x = centerX - w / 2 - farX;
-          y = centerY + 152;
+          y = centerY + 150;
           scale = 0.62;
           rotate = -34;
           opacity = 0;
@@ -126,7 +126,7 @@
           pointer = 'none';
         } else if (slot === 2) {
           x = centerX - w / 2 + farX;
-          y = centerY + 152;
+          y = centerY + 150;
           scale = 0.62;
           rotate = 34;
           opacity = 0;
