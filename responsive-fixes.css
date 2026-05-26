@@ -178,6 +178,17 @@
     user-select: none;
   }
 
+  /* The old Claude CSS had transform:hover !important. This forces hover/press to keep the JS wheel transform. */
+  .stage-scroll .float-card:hover,
+  .stage-scroll .float-card:active,
+  .stage-scroll .float-card:focus,
+  .stage-scroll .float-card:focus-visible {
+    transform: var(--wheel-transform) !important;
+    box-shadow: var(--shadow-lg) !important;
+    z-index: inherit !important;
+    outline: none !important;
+  }
+
   /* Extra hard kill: no card children should steal the swipe gesture. */
   .stage-scroll .float-card * {
     pointer-events: none !important;
