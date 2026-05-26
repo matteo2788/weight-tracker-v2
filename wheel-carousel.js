@@ -18,10 +18,12 @@
     if (stage.dataset.wheelReady === 'true') return;
     stage.dataset.wheelReady = 'true';
 
-    // Start with the middle card visually upfront.
-    let active = Math.floor(cards.length / 2);
+    let targetIndex = Math.floor(cards.length / 2);
+    let currentIndex = targetIndex;
+
     let startX = 0;
     let dragging = false;
+    let raf = null;
 
     function clearDesktopInlineStyles() {
       cards.forEach((card) => {
@@ -29,8 +31,8 @@
         card.style.removeProperty('height');
         card.style.removeProperty('opacity');
         card.style.removeProperty('filter');
-        card.style.removeProperty('pointer-events');
-        card.style.removeProperty('z-index');
+        card.style.removeProperty('pointerEvents');
+        card.style.removeProperty('zIndex');
         card.style.removeProperty('transform');
       });
     }
@@ -45,8 +47,8 @@
     function cardWidth(index) {
       const vw = window.innerWidth;
       if (index === 0) return Math.min(vw * 0.82, 326);
-      if (index === 5) return Math.min(vw * 0.78, 305);
-      return Math.min(vw * 0.74, 292);
+      if (index === 5) return Math.min(vw * 0.78, 300);
+      return Math.min(vw * 0.72, 286);
     }
 
     function cardHeight(index) {
@@ -61,24 +63,42 @@
         return;
       }
 
-      const centerX = viewport.clientWidth / 2;
-      const baseY = 18;
       const total = cards.length;
+      const centerX = viewport.clientWidth / 2;
+      const wheelRadiusX = Math.min(viewport.clientWidth * 0.34, 130);
+      const wheelRadiusY = 72;
+      const baseY = 18;
 
       cards.forEach((card, index) => {
-        const diff = circularDiff(index, active, total);
-        const abs = Math.abs(diff);
+        const diff = circularDiff(index, currentIndex, total);
+
+        // Hide really far cards so the wheel stays clean
+        if (Math.abs(diff) > 2.4) {
+          card.style.opacity = '0';
+          card.style.pointerEvents = 'none';
+          return;
+        }
+
         const w = cardWidth(index);
         const h = cardHeight(index);
 
-        // Fixed circular wheel slots. The active card is always exactly center/front.
-        const x = centerX - w / 2 + diff * 112;
-        const y = baseY + abs * 42 + Math.pow(abs, 2) * 8;
-        const scale = 1 - Math.min(abs * 0.11, 0.32);
-        const rotate = diff * -8.5;
-        const opacity = abs > 2.1 ? 0.36 : abs > 1.45 ? 0.72 : 1;
-        const blur = abs > 2.1 ? 0.8 : 0;
-        const z = Math.round(100 - abs * 18);
+        // Turn diff into an arc angle
+        // center = 0, left/right move around the wheel
+        const angle = diff * 0.72;
+
+        // Arc positions
+        const xOffset = Math.sin(angle) * wheelRadiusX;
+        const yOffset = (1 - Math.cos(angle)) * wheelRadiusY;
+
+        // Better wheel feel
+        const scale = 1 - Math.min(Math.abs(diff) * 0.12, 0.28);
+        const rotate = diff * -13;
+        const opacity = 1 - Math.min(Math.abs(diff) * 0.22, 0.55);
+        const blur = Math.abs(diff) > 1.7 ? 1.1 : 0;
+        const z = Math.round(100 - Math.abs(diff) * 20);
+
+        const x = centerX - w / 2 + xOffset;
+        const y = baseY + yOffset;
 
         card.style.width = Math.round(w) + 'px';
         card.style.height = h + 'px';
@@ -86,28 +106,64 @@
         card.style.zIndex = String(z);
         card.style.opacity = String(opacity);
         card.style.filter = blur ? `blur(${blur}px)` : 'none';
-        card.style.pointerEvents = abs > 2.25 ? 'none' : 'auto';
+        card.style.pointerEvents = 'auto';
       });
     }
 
-    function move(delta) {
-      active = mod(active + delta, cards.length);
+    function animate() {
+      if (!isMobileWheel()) {
+        render();
+        raf = null;
+        return;
+      }
+
+      let diff = targetIndex - currentIndex;
+      const total = cards.length;
+
+      if (diff > total / 2) diff -= total;
+      if (diff < -total / 2) diff += total;
+
+      currentIndex += diff * 0.16;
+
+      if (Math.abs(diff) < 0.001) {
+        currentIndex = targetIndex;
+      }
+
       render();
+
+      if (Math.abs(diff) > 0.001) {
+        raf = requestAnimationFrame(animate);
+      } else {
+        raf = null;
+      }
     }
 
-    viewport.addEventListener('touchstart', (event) => {
-      if (!isMobileWheel()) return;
-      dragging = true;
-      startX = event.touches[0].clientX;
-    }, { passive: true });
+    function go(delta) {
+      targetIndex = mod(targetIndex + delta, cards.length);
+      if (!raf) raf = requestAnimationFrame(animate);
+    }
 
-    viewport.addEventListener('touchend', (event) => {
-      if (!isMobileWheel() || !dragging) return;
-      dragging = false;
-      const endX = event.changedTouches[0].clientX;
-      const delta = endX - startX;
-      if (Math.abs(delta) > 34) move(delta < 0 ? 1 : -1);
-    }, { passive: true });
+    viewport.addEventListener(
+      'touchstart',
+      (event) => {
+        if (!isMobileWheel()) return;
+        dragging = true;
+        startX = event.touches[0].clientX;
+      },
+      { passive: true }
+    );
+
+    viewport.addEventListener(
+      'touchend',
+      (event) => {
+        if (!isMobileWheel() || !dragging) return;
+        dragging = false;
+        const endX = event.changedTouches[0].clientX;
+        const delta = endX - startX;
+        if (Math.abs(delta) > 28) go(delta < 0 ? 1 : -1);
+      },
+      { passive: true }
+    );
 
     viewport.addEventListener('pointerdown', (event) => {
       if (!isMobileWheel()) return;
@@ -119,20 +175,16 @@
       if (!isMobileWheel() || !dragging) return;
       dragging = false;
       const delta = event.clientX - startX;
-      if (Math.abs(delta) > 34) move(delta < 0 ? 1 : -1);
+      if (Math.abs(delta) > 28) go(delta < 0 ? 1 : -1);
     });
 
-    viewport.addEventListener('wheel', (event) => {
-      if (!isMobileWheel()) return;
-      if (Math.abs(event.deltaX) + Math.abs(event.deltaY) < 10) return;
-      event.preventDefault();
-      move((event.deltaX || event.deltaY) > 0 ? 1 : -1);
-    }, { passive: false });
+    window.addEventListener('resize', () => {
+      render();
+    });
 
-    window.addEventListener('resize', render);
     render();
-    setTimeout(render, 400);
-    setTimeout(render, 900);
+    setTimeout(render, 300);
+    setTimeout(render, 700);
   }
 
   window.addEventListener('load', setupWheel);
