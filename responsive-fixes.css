@@ -178,14 +178,14 @@
     user-select: none;
   }
 
-  /* The old Claude CSS had transform:hover !important. This forces hover/press to keep the JS wheel transform. */
+  /* The old Claude CSS had transform:hover and z-index:hover. Keep exact wheel position/layer on press. */
   .stage-scroll .float-card:hover,
   .stage-scroll .float-card:active,
   .stage-scroll .float-card:focus,
   .stage-scroll .float-card:focus-visible {
     transform: var(--wheel-transform) !important;
+    z-index: var(--wheel-z) !important;
     box-shadow: var(--shadow-lg) !important;
-    z-index: inherit !important;
     outline: none !important;
   }
 
