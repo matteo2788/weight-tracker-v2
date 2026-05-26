@@ -2,6 +2,12 @@
   function setupMobileMenu() {
     if (document.querySelector('.mobile-clean-menu-button')) return;
 
+    const homeButton = document.createElement('button');
+    homeButton.className = 'mobile-clean-home-button';
+    homeButton.type = 'button';
+    homeButton.setAttribute('aria-label', 'Go to dashboard');
+    homeButton.textContent = 'Drift';
+
     const button = document.createElement('button');
     button.className = 'mobile-clean-menu-button';
     button.type = 'button';
@@ -18,6 +24,7 @@
       <button type="button" data-screen="settings">Settings <span>-></span></button>
     `;
 
+    document.body.appendChild(homeButton);
     document.body.appendChild(button);
     document.body.appendChild(menu);
 
@@ -33,6 +40,21 @@
       button.setAttribute('aria-label', 'Close menu');
     }
 
+    function goToScreen(target) {
+      closeMenu();
+      const existingButton = Array.from(document.querySelectorAll('button, a')).find(function (el) {
+        return (el.textContent || '').trim().toLowerCase() === target;
+      });
+
+      if (existingButton && typeof existingButton.click === 'function') {
+        existingButton.click();
+      }
+    }
+
+    homeButton.addEventListener('click', function () {
+      goToScreen('dashboard');
+    });
+
     button.addEventListener('click', function () {
       if (document.body.classList.contains('mobile-menu-open')) closeMenu();
       else openMenu();
@@ -41,16 +63,7 @@
     menu.addEventListener('click', function (event) {
       const item = event.target.closest('[data-screen]');
       if (!item) return;
-      const target = item.getAttribute('data-screen');
-      closeMenu();
-
-      const existingButton = Array.from(document.querySelectorAll('button, a')).find(function (el) {
-        return (el.textContent || '').trim().toLowerCase() === target;
-      });
-
-      if (existingButton && typeof existingButton.click === 'function') {
-        existingButton.click();
-      }
+      goToScreen(item.getAttribute('data-screen'));
     });
 
     document.addEventListener('keydown', function (event) {
