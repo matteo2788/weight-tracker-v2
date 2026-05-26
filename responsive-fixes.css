@@ -155,7 +155,7 @@
     box-shadow: var(--shadow-lg) !important;
     transform-origin: center bottom !important;
     will-change: transform, opacity;
-    transition: transform 360ms cubic-bezier(.22,1,.36,1), opacity 240ms ease, filter 240ms ease;
+    transition: none !important;
   }
 
   .float-card:hover {
