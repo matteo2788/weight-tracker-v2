@@ -1,6 +1,6 @@
 (function () {
-  function clamp(value, min, max) {
-    return Math.max(min, Math.min(max, value));
+  function mod(n, m) {
+    return ((n % m) + m) % m;
   }
 
   function isMobileWheel() {
@@ -18,7 +18,8 @@
     if (stage.dataset.wheelReady === 'true') return;
     stage.dataset.wheelReady = 'true';
 
-    let active = 0;
+    // Start with the middle card visually upfront.
+    let active = Math.floor(cards.length / 2);
     let startX = 0;
     let dragging = false;
 
@@ -34,11 +35,18 @@
       });
     }
 
+    function circularDiff(index, current, total) {
+      let diff = index - current;
+      if (diff > total / 2) diff -= total;
+      if (diff < -total / 2) diff += total;
+      return diff;
+    }
+
     function cardWidth(index) {
       const vw = window.innerWidth;
       if (index === 0) return Math.min(vw * 0.82, 326);
       if (index === 5) return Math.min(vw * 0.78, 305);
-      return Math.min(vw * 0.72, 286);
+      return Math.min(vw * 0.74, 292);
     }
 
     function cardHeight(index) {
@@ -55,19 +63,21 @@
 
       const centerX = viewport.clientWidth / 2;
       const baseY = 18;
+      const total = cards.length;
 
       cards.forEach((card, index) => {
-        const diff = clamp(index - active, -3, 3);
+        const diff = circularDiff(index, active, total);
         const abs = Math.abs(diff);
         const w = cardWidth(index);
         const h = cardHeight(index);
 
-        const x = centerX - w / 2 + diff * 108;
-        const y = baseY + abs * 42 + Math.pow(abs, 2) * 7;
-        const scale = 1 - Math.min(abs * 0.105, 0.30);
-        const rotate = diff * -8;
-        const opacity = abs > 2.35 ? 0.28 : abs > 1.8 ? 0.58 : 1;
-        const blur = abs > 2.1 ? 1.2 : 0;
+        // Fixed circular wheel slots. The active card is always exactly center/front.
+        const x = centerX - w / 2 + diff * 112;
+        const y = baseY + abs * 42 + Math.pow(abs, 2) * 8;
+        const scale = 1 - Math.min(abs * 0.11, 0.32);
+        const rotate = diff * -8.5;
+        const opacity = abs > 2.1 ? 0.36 : abs > 1.45 ? 0.72 : 1;
+        const blur = abs > 2.1 ? 0.8 : 0;
         const z = Math.round(100 - abs * 18);
 
         card.style.width = Math.round(w) + 'px';
@@ -76,12 +86,12 @@
         card.style.zIndex = String(z);
         card.style.opacity = String(opacity);
         card.style.filter = blur ? `blur(${blur}px)` : 'none';
-        card.style.pointerEvents = abs > 2.3 ? 'none' : 'auto';
+        card.style.pointerEvents = abs > 2.25 ? 'none' : 'auto';
       });
     }
 
     function move(delta) {
-      active = clamp(active + delta, 0, cards.length - 1);
+      active = mod(active + delta, cards.length);
       render();
     }
 
