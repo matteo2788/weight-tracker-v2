@@ -16,7 +16,13 @@
 
     const total = cards.length;
 
-    // Card index 0 is the Today / logged weight card. Always open here.
+    // Visual wheel order. This keeps the black Insight card from appearing immediately beside Today.
+    // DOM index 0 = Today, 1 = This week, 2 = 30 days, 5 = Insight, 3 = Streak, 4 = Month range.
+    const wheelOrder = [0, 1, 2, 5, 3, 4].filter((index) => index < total);
+    const orderLength = wheelOrder.length;
+    const orderPositionByCard = new Map(wheelOrder.map((cardIndex, orderIndex) => [cardIndex, orderIndex]));
+
+    // Always open on Today / logged weight.
     let position = 0;
     let targetPosition = position;
     let velocity = 0;
@@ -27,10 +33,9 @@
     let raf = null;
     let lastWheelMove = 0;
 
-    function circularDiff(index, current, total) {
+    function circularDiff(index, current, totalCount) {
       let diff = index - current;
-      // True infinite wrap. This works even after hundreds of swipes.
-      diff -= Math.round(diff / total) * total;
+      diff -= Math.round(diff / totalCount) * totalCount;
       return diff;
     }
 
@@ -79,8 +84,8 @@
     }
 
     function normalizePosition() {
-      if (Math.abs(position) < total * 2 && Math.abs(targetPosition) < total * 2) return;
-      const shift = Math.round(position / total) * total;
+      if (Math.abs(position) < orderLength * 2 && Math.abs(targetPosition) < orderLength * 2) return;
+      const shift = Math.round(position / orderLength) * orderLength;
       position -= shift;
       targetPosition -= shift;
       startPosition -= shift;
@@ -101,7 +106,8 @@
       const size = cardSize();
 
       cards.forEach((card, index) => {
-        const diff = circularDiff(index, position, total);
+        const orderedIndex = orderPositionByCard.has(index) ? orderPositionByCard.get(index) : index;
+        const diff = circularDiff(orderedIndex, position, orderLength);
         const abs = Math.abs(diff);
         const w = size.width;
         const h = size.height;
@@ -145,7 +151,6 @@
         setCard(card, transform, opacity, z, pointer);
       });
 
-      // Reveal only after all cards have their correct first position.
       stage.classList.add('wheel-ready');
     }
 
