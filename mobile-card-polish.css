@@ -1,6 +1,16 @@
 /* Mobile wheel card visual polish — loaded after responsive-fixes.css */
 
 @media (max-width: 820px) {
+  /* Prevent the initial stacked-card flash before JS positions the wheel. */
+  .stage:not(.wheel-ready) .float-card {
+    opacity: 0 !important;
+    visibility: hidden !important;
+  }
+
+  .stage.wheel-ready .float-card {
+    visibility: visible !important;
+  }
+
   .stage-scroll .float-card {
     justify-content: flex-start !important;
     gap: 0 !important;
