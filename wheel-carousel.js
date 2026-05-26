@@ -3,10 +3,6 @@
     return window.matchMedia('(max-width: 820px)').matches;
   }
 
-  function clamp(value, min, max) {
-    return Math.max(min, Math.min(max, value));
-  }
-
   function setupWheel() {
     const viewport = document.querySelector('.stage-scroll');
     const stage = document.querySelector('.stage');
@@ -113,23 +109,23 @@
         card.style.overflow = 'hidden';
         card.style.transition = isDragging
           ? 'none'
-          : 'transform 300ms cubic-bezier(.2,.85,.25,1), opacity 220ms ease';
+          : 'transform 260ms cubic-bezier(.2,.9,.25,1), opacity 200ms ease';
         card.style.filter = 'none';
 
-        let x = centerX - w / 2;
-        let y = centerY;
-        let scale = 1;
-        let rotate = 0;
-        let opacity = 1;
-        let z = 100;
-        let pointer = 'auto';
+        let x;
+        let y;
+        let scale;
+        let rotate;
+        let opacity;
+        let z;
+        let pointer;
 
-        if (abs <= 2.05) {
+        if (abs <= 2.15) {
           x = centerX - w / 2 + diff * sideX;
           y = centerY + Math.pow(abs, 1.35) * 82;
           scale = 1 - Math.min(abs * 0.22, 0.38);
           rotate = diff * 22;
-          opacity = abs > 1.55 ? Math.max(0, 1 - (abs - 1.55) / 0.45) : 1;
+          opacity = abs > 1.62 ? Math.max(0, 1 - (abs - 1.62) / 0.53) : 1;
           z = Math.round(100 - abs * 24);
           pointer = abs < 0.45 ? 'auto' : 'none';
         } else {
@@ -151,12 +147,12 @@
       });
     }
 
-    function settle(delta) {
+    function settle(moveBy) {
       const now = Date.now();
-      if (now - lastMoveTime < 70) return;
+      if (now - lastMoveTime < 45) return;
       lastMoveTime = now;
 
-      active = (active + delta + total) % total;
+      active = ((active + moveBy) % total + total) % total;
       dragOffset = 0;
       render(false);
     }
@@ -169,17 +165,21 @@
       dragOffset = 0;
       activePointerId = event.pointerId;
       try { viewport.setPointerCapture(event.pointerId); } catch (e) {}
+      render(true);
     });
 
     viewport.addEventListener('pointermove', (event) => {
       if (!isMobileWheel() || !pointerDown) return;
       if (activePointerId !== null && event.pointerId !== activePointerId) return;
+      event.preventDefault();
       currentX = event.clientX;
       const delta = currentX - startX;
-      const dragDistance = Math.min(viewport.clientWidth * 0.42, 170);
-      dragOffset = clamp(-delta / dragDistance, -0.95, 0.95);
+      const dragDistance = Math.min(viewport.clientWidth * 0.55, 220);
+
+      // Continuous drag: no magnetic clamp while your finger is moving.
+      dragOffset = -delta / dragDistance;
       requestRender(true);
-    });
+    }, { passive: false });
 
     viewport.addEventListener('pointerup', (event) => {
       if (!isMobileWheel() || !pointerDown) return;
@@ -187,8 +187,10 @@
       pointerDown = false;
       activePointerId = null;
       const delta = event.clientX - startX;
-      const moveBy = Math.abs(dragOffset) > 0.26 || Math.abs(delta) > 52
-        ? (dragOffset > 0 ? 1 : -1)
+      const dragDistance = Math.min(viewport.clientWidth * 0.55, 220);
+      const rawOffset = -delta / dragDistance;
+      const moveBy = Math.abs(rawOffset) > 0.18 || Math.abs(delta) > 34
+        ? Math.round(rawOffset)
         : 0;
       dragOffset = 0;
       settle(moveBy);
