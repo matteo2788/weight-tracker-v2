@@ -170,12 +170,145 @@
     margin: 0 !important;
     margin-left: 0 !important;
     max-width: none !important;
-    border-radius: 24px !important;
-    box-shadow: var(--shadow-lg) !important;
+    border-radius: 28px !important;
+    box-shadow: 0 22px 60px rgba(16, 14, 10, .18), 0 4px 14px rgba(16, 14, 10, .08) !important;
     transform-origin: center bottom !important;
     will-change: transform, opacity;
     -webkit-tap-highlight-color: transparent;
     user-select: none;
+    padding: 20px 20px 18px !important;
+    border: 1px solid rgba(20, 18, 14, .07) !important;
+    background: linear-gradient(145deg, #fffaf2 0%, #f6efe4 100%) !important;
+    color: #171614 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+    box-sizing: border-box !important;
+    contain: layout paint;
+  }
+
+  .stage-scroll .float-card::after {
+    content: "";
+    position: absolute;
+    inset: 1px;
+    border-radius: 27px;
+    pointer-events: none;
+    background: linear-gradient(180deg, rgba(255,255,255,.42), rgba(255,255,255,0) 44%);
+    opacity: .8;
+  }
+
+  .stage-scroll .float-card[style*="#171614"],
+  .stage-scroll .float-card[style*="var(--ink)"],
+  .stage-scroll .float-card:nth-child(6) {
+    background: linear-gradient(145deg, #181715 0%, #0f0f10 100%) !important;
+    color: #f3eee7 !important;
+    border-color: rgba(243, 238, 231, .10) !important;
+  }
+
+  .stage-scroll .float-card > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .stage-scroll .float-card .t-label,
+  .stage-scroll .float-card [class*="t-label"] {
+    font-size: 10px !important;
+    line-height: 1 !important;
+    letter-spacing: .14em !important;
+    text-transform: uppercase !important;
+    font-weight: 650 !important;
+    color: rgba(23, 22, 20, .52) !important;
+  }
+
+  .stage-scroll .float-card:nth-child(6) .t-label,
+  .stage-scroll .float-card:nth-child(6) [class*="t-label"] {
+    color: rgba(243, 238, 231, .58) !important;
+  }
+
+  .stage-scroll .pill {
+    height: 24px !important;
+    padding: 0 10px !important;
+    border-radius: 999px !important;
+    font-size: 10px !important;
+    line-height: 24px !important;
+    letter-spacing: .04em !important;
+    background: rgba(77, 98, 72, .10) !important;
+    color: #3f563b !important;
+    border: 1px solid rgba(77, 98, 72, .14) !important;
+    white-space: nowrap !important;
+  }
+
+  .stage-scroll .dot {
+    width: 6px !important;
+    height: 6px !important;
+  }
+
+  .stage-scroll .float-card .t-num-xl {
+    font-size: clamp(38px, 12vw, 56px) !important;
+    line-height: .92 !important;
+    letter-spacing: -.055em !important;
+    font-weight: 560 !important;
+    color: inherit !important;
+    font-variant-numeric: tabular-nums !important;
+  }
+
+  .stage-scroll .float-card .serif-i {
+    font-size: 17px !important;
+    line-height: 1 !important;
+    color: rgba(23, 22, 20, .48) !important;
+    letter-spacing: -.02em !important;
+  }
+
+  .stage-scroll .float-card:nth-child(6) .serif-i {
+    color: rgba(243, 238, 231, .58) !important;
+  }
+
+  .stage-scroll .float-card .hairline-soft {
+    margin: 12px 0 !important;
+    background: rgba(23, 22, 20, .09) !important;
+  }
+
+  .stage-scroll .float-card:nth-child(6) .hairline-soft {
+    background: rgba(243, 238, 231, .12) !important;
+  }
+
+  .stage-scroll .float-card svg {
+    max-width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .stage-scroll .float-card:nth-child(2) svg,
+  .stage-scroll .float-card:nth-child(3) svg {
+    width: 100% !important;
+    max-height: 54px !important;
+  }
+
+  .stage-scroll .float-card div[style*="font-size: 14"] {
+    font-size: 13px !important;
+    line-height: 1.42 !important;
+    color: rgba(243, 238, 231, .84) !important;
+  }
+
+  .stage-scroll .float-card div[style*="font-size: 12"],
+  .stage-scroll .float-card div[style*="font-size: 11"],
+  .stage-scroll .float-card span[style*="font-size: 12"],
+  .stage-scroll .float-card span[style*="font-size: 11"] {
+    font-size: 11px !important;
+    line-height: 1.25 !important;
+  }
+
+  .stage-scroll .float-card div[style*="marginTop: 16"],
+  .stage-scroll .float-card div[style*="margin-top: 16"] {
+    margin-top: 10px !important;
+  }
+
+  .stage-scroll .float-card div[style*="marginTop: 12"],
+  .stage-scroll .float-card div[style*="margin-top: 12"],
+  .stage-scroll .float-card div[style*="marginTop: 10"],
+  .stage-scroll .float-card div[style*="margin-top: 10"] {
+    margin-top: 8px !important;
   }
 
   /* The old Claude CSS had transform:hover and z-index:hover. Keep exact wheel position/layer on press. */
@@ -185,7 +318,7 @@
   .stage-scroll .float-card:focus-visible {
     transform: var(--wheel-transform) !important;
     z-index: var(--wheel-z) !important;
-    box-shadow: var(--shadow-lg) !important;
+    box-shadow: 0 22px 60px rgba(16, 14, 10, .18), 0 4px 14px rgba(16, 14, 10, .08) !important;
     outline: none !important;
   }
 
@@ -193,10 +326,6 @@
   .stage-scroll .float-card * {
     pointer-events: none !important;
     user-select: none;
-  }
-
-  .float-card .t-num-xl[style*="font-size: 76"] {
-    font-size: clamp(62px, 18vw, 76px) !important;
   }
 
   .section {
@@ -237,22 +366,31 @@
   }
 
   .stage-scroll {
-    height: 338px !important;
+    height: 350px !important;
     margin-left: -16px !important;
     margin-right: -16px !important;
     margin-top: 34px !important;
   }
 
   .stage {
-    height: 310px !important;
+    height: 322px !important;
   }
 
-  .float-card {
-    padding: 20px !important;
+  .stage-scroll .float-card {
+    padding: 18px 18px 16px !important;
+    border-radius: 26px !important;
   }
 
-  .float-card .t-num-xl[style*="font-size: 76"] {
-    font-size: 64px !important;
+  .stage-scroll .float-card::after {
+    border-radius: 25px;
+  }
+
+  .stage-scroll .float-card .t-num-xl {
+    font-size: clamp(36px, 13vw, 52px) !important;
+  }
+
+  .stage-scroll .float-card .serif-i {
+    font-size: 15px !important;
   }
 
   .stage svg {
