@@ -1,10 +1,12 @@
 (function () {
-  function mod(n, m) {
-    return ((n % m) + m) % m;
-  }
-
   function isMobileWheel() {
     return window.matchMedia('(max-width: 820px)').matches;
+  }
+
+  function circularDiff(index, current, total) {
+    let diff = index - current;
+    diff -= Math.round(diff / total) * total;
+    return diff;
   }
 
   function setupWheel() {
@@ -18,7 +20,8 @@
     if (stage.dataset.wheelReady === 'true') return;
     stage.dataset.wheelReady = 'true';
 
-    let targetIndex = Math.floor(cards.length / 2);
+    const total = cards.length;
+    let targetIndex = Math.floor(total / 2);
     let currentIndex = targetIndex;
     let startX = 0;
     let pointerDown = false;
@@ -38,13 +41,6 @@
         card.style.removeProperty('background');
         card.style.removeProperty('backdrop-filter');
       });
-    }
-
-    function circularDiff(index, current, total) {
-      let diff = index - current;
-      if (diff > total / 2) diff -= total;
-      if (diff < -total / 2) diff += total;
-      return diff;
     }
 
     function cardWidth(index) {
@@ -73,7 +69,6 @@
         return;
       }
 
-      const total = cards.length;
       const centerX = viewport.clientWidth / 2;
       const baseY = 18;
       const spacing = Math.min(viewport.clientWidth * 0.66, 268);
@@ -82,7 +77,6 @@
       cards.forEach((card, index) => {
         const diff = circularDiff(index, currentIndex, total);
         const abs = Math.abs(diff);
-        const roundedAbs = Math.round(abs * 1000) / 1000;
         const w = cardWidth(index);
         const h = cardHeight(index);
 
@@ -90,7 +84,7 @@
         card.style.width = Math.round(w) + 'px';
         card.style.height = h + 'px';
 
-        if (roundedAbs > 2.02) {
+        if (abs > 2.02) {
           card.style.transform = `translate3d(${centerX - w / 2}px, ${baseY + 130}px, 0) scale(.68) rotate(0deg)`;
           card.style.zIndex = '1';
           card.style.opacity = '0';
@@ -115,6 +109,13 @@
       });
     }
 
+    function normalizeIndexesIfNeeded() {
+      if (Math.abs(targetIndex) < total * 4) return;
+      const shift = Math.round(targetIndex / total) * total;
+      targetIndex -= shift;
+      currentIndex -= shift;
+    }
+
     function animate() {
       if (!isMobileWheel()) {
         render();
@@ -122,25 +123,29 @@
         return;
       }
 
-      let diff = targetIndex - currentIndex;
-      const total = cards.length;
-      if (diff > total / 2) diff -= total;
-      if (diff < -total / 2) diff += total;
-
+      const diff = targetIndex - currentIndex;
       currentIndex += diff * 0.16;
-      if (Math.abs(diff) < 0.002) currentIndex = targetIndex;
+
+      if (Math.abs(diff) < 0.002) {
+        currentIndex = targetIndex;
+        render();
+        normalizeIndexesIfNeeded();
+        raf = null;
+        return;
+      }
 
       render();
-
-      if (Math.abs(diff) > 0.002) raf = requestAnimationFrame(animate);
-      else raf = null;
+      raf = requestAnimationFrame(animate);
     }
 
     function go(delta) {
       const now = Date.now();
       if (now - lastMoveTime < 190) return;
       lastMoveTime = now;
-      targetIndex = mod(targetIndex + delta, cards.length);
+
+      // Continuous index fixes the left-wrap sticking bug.
+      // Do not modulo here. The render function wraps visually.
+      targetIndex += delta;
       if (!raf) raf = requestAnimationFrame(animate);
     }
 
