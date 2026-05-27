@@ -19,6 +19,25 @@
       return () => ro.disconnect();
     }, []);
 
+    // Clear the tooltip when the user taps/clicks anywhere outside the chart.
+    useEffect(() => {
+      const clearWhenOutside = (event) => {
+        if (!ref.current) return;
+        if (!ref.current.contains(event.target)) {
+          setHoverIdx(null);
+          setIsTouching(false);
+        }
+      };
+
+      document.addEventListener("pointerdown", clearWhenOutside, true);
+      document.addEventListener("touchstart", clearWhenOutside, true);
+
+      return () => {
+        document.removeEventListener("pointerdown", clearWhenOutside, true);
+        document.removeEventListener("touchstart", clearWhenOutside, true);
+      };
+    }, []);
+
     if (!data.length) return null;
 
     const mobile = w < 560;
