@@ -17,6 +17,7 @@ const App = () => {
   const navItems = [
     { id: "dashboard", label: "Dashboard" },
     { id: "trends", label: "Trends" },
+    { id: "goals", label: "Goals" },
     { id: "history", label: "History" },
     { id: "insights", label: "Insights" },
     { id: "settings", label: "Settings" },
@@ -97,6 +98,7 @@ const App = () => {
       <main key={`${screen}-${dataVersion}`}>
         {screen === "dashboard" && <Drift.Dashboard onNav={goTo} onLog={() => openLog()}/>} 
         {screen === "trends" && <Drift.TrendsScreen onNav={goTo}/>} 
+        {screen === "goals" && <Drift.GoalsScreen/>}
         {screen === "history" && <Drift.HistoryScreen onNav={goTo} onEdit={openLog}/>} 
         {screen === "insights" && <Drift.InsightsScreen onNav={goTo}/>} 
         {screen === "settings" && <Drift.SettingsScreen/>}
@@ -109,7 +111,7 @@ const App = () => {
             <span style={{ marginLeft: 12 }}>The quiet weight tracker</span>
           </div>
           <div className="row gap-6">
-            <span>v 2.4</span>
+            <span>v 2.5</span>
             <span>{window.fmtDateLong(window.DriftData.today)}</span>
             <span>·</span>
             <span>Saved locally</span>
