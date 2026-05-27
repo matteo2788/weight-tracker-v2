@@ -39,7 +39,7 @@
 
   .stepper {
     margin: 18px 0 8px !important;
-    gap: clamp(14px, 5vw, 26px) !important;
+    gap: clamp(12px, 4vw, 22px) !important;
   }
 
   .stepper-btn {
@@ -50,9 +50,17 @@
   }
 
   .stepper input {
-    width: clamp(150px, 44vw, 205px) !important;
-    font-size: clamp(64px, 18vw, 88px) !important;
-    line-height: .9 !important;
+    width: clamp(190px, 54vw, 250px) !important;
+    min-width: 0 !important;
+    max-width: 62vw !important;
+    font-size: clamp(58px, 15.5vw, 82px) !important;
+    line-height: 1.08 !important;
+    height: auto !important;
+    min-height: 86px !important;
+    padding: 0 4px 8px !important;
+    overflow: visible !important;
+    text-align: center !important;
+    box-sizing: border-box !important;
   }
 
   .stepper-unit {
@@ -153,7 +161,7 @@
   }
 
   .stepper {
-    gap: 16px !important;
+    gap: 10px !important;
   }
 
   .stepper-btn {
@@ -163,8 +171,12 @@
   }
 
   .stepper input {
-    width: clamp(130px, 42vw, 172px) !important;
-    font-size: clamp(58px, 17vw, 74px) !important;
+    width: clamp(176px, 52vw, 218px) !important;
+    max-width: 56vw !important;
+    font-size: clamp(52px, 14.8vw, 68px) !important;
+    line-height: 1.1 !important;
+    min-height: 78px !important;
+    padding-bottom: 9px !important;
   }
 
   .modal input.input[type="date"] {
