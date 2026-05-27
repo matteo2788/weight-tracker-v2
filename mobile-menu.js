@@ -28,6 +28,7 @@
     menu.innerHTML = `
       <button type="button" data-screen="dashboard">Dashboard <span>-></span></button>
       <button type="button" data-screen="trends">Trends <span>-></span></button>
+      <button type="button" data-screen="goals">Goals <span>-></span></button>
       <button type="button" data-screen="history">History <span>-></span></button>
       <button type="button" data-screen="insights">Insights <span>-></span></button>
       <button type="button" data-screen="settings">Settings <span>-></span></button>
