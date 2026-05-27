@@ -109,34 +109,36 @@
               Daily weight is noisy. The shapes below filter that out so you see the direction your body is actually moving.
             </p>
           </div>
-          <div className="tabs">
+          <div className="tabs trends-range-tabs">
             {["30", "60", "90", "120"].map(r => (
               <button key={r} className={`tab ${range === r ? "active" : ""}`} onClick={() => setRange(r)}>{r}d</button>
             ))}
           </div>
         </div>
 
-        <div className="big-card">
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "end", marginBottom: 24 }}>
-            <div>
+        <div className="big-card trends-chart-card">
+          <div className="trends-summary-strip">
+            <div className="trend-summary-item average">
               <div className="t-label">Average · selected range</div>
-              <div style={{ display: "flex", alignItems: "baseline", gap: 6, marginTop: 4 }}>
-                <span className="t-num-xl" style={{ fontSize: 56 }}>{avg.toFixed(1)}</span>
-                <span className="serif-i" style={{ fontSize: 22, color: "var(--ink-3)" }}>lb</span>
+              <div className="trend-summary-value">
+                <span className="t-num-xl">{avg.toFixed(1)}</span>
+                <span className="serif-i">lb</span>
               </div>
             </div>
-            <div style={{ textAlign: "right" }}>
+            <div className="trend-summary-item change">
               <div className="t-label">Net change</div>
-              <div style={{ display: "flex", alignItems: "baseline", gap: 6, marginTop: 4, justifyContent: "flex-end" }}>
-                <span className="t-num-xl" style={{ fontSize: 36, color: rangeChange < 0 ? "#4D6248" : "var(--ink)" }}>{window.fmtChange(rangeChange)}</span>
-                <span className="serif-i" style={{ fontSize: 16, color: "var(--ink-3)" }}>lb</span>
+              <div className="trend-summary-value">
+                <span className="t-num-xl" style={{ color: rangeChange < 0 ? "#4D6248" : "var(--ink)" }}>{window.fmtChange(rangeChange)}</span>
+                <span className="serif-i">lb</span>
               </div>
             </div>
           </div>
-          <Drift.TrendChart entries={entries} height={380} days={days}/>
+          <div className="trend-chart-wrap">
+            <Drift.TrendChart entries={entries} height={380} days={days}/>
+          </div>
         </div>
 
-        <div className="grid grid-4" style={{ marginTop: 24 }}>
+        <div className="grid grid-4 trends-metric-grid" style={{ marginTop: 24 }}>
           <Drift.MetricCard label="7-day avg" value={stats.todayAvg.toFixed(1)} change={stats.weekChange} sub="vs. last week"/>
           <Drift.MetricCard label="Weekly rate" value={window.fmtChange(ratePerWeek)} unit="lb/wk" sub={`over ${days} days`}/>
           <Drift.MetricCard label="High · range" value={rangeHigh.toFixed(1)} sub={`over ${days} days`}/>
