@@ -1,0 +1,74 @@
+/* Mobile orientation guard — keep the app portrait-first */
+
+.orientation-lock-message {
+  display: none;
+}
+
+@media (max-width: 920px) and (orientation: landscape) {
+  html,
+  body {
+    overflow: hidden !important;
+    background: #F4F0E8 !important;
+  }
+
+  #root {
+    filter: blur(10px) saturate(.78) opacity(.18) !important;
+    pointer-events: none !important;
+    transform: scale(.98) !important;
+    transform-origin: center !important;
+  }
+
+  .orientation-lock-message {
+    position: fixed;
+    inset: 0;
+    z-index: 999999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 28px;
+    background:
+      radial-gradient(circle at 50% 18%, rgba(201,168,124,.16), transparent 34%),
+      #F4F0E8;
+    color: #171614;
+    text-align: center;
+  }
+
+  .orientation-lock-card {
+    width: min(420px, 92vw);
+    border: 1px solid rgba(23,22,20,.10);
+    border-radius: 28px;
+    padding: 28px 24px 26px;
+    background: rgba(250,246,238,.72);
+    box-shadow: 0 28px 70px rgba(18,16,12,.12), inset 0 1px 0 rgba(255,255,255,.62);
+  }
+
+  .orientation-lock-icon {
+    width: 54px;
+    height: 54px;
+    margin: 0 auto 18px;
+    border-radius: 18px;
+    border: 1px solid rgba(23,22,20,.10);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 25px;
+    background: rgba(255,250,242,.72);
+  }
+
+  .orientation-lock-title {
+    font-family: var(--font-sans);
+    font-size: 28px;
+    line-height: .98;
+    letter-spacing: -.045em;
+    font-weight: 560;
+    margin: 0;
+  }
+
+  .orientation-lock-copy {
+    margin: 12px auto 0;
+    max-width: 280px;
+    color: rgba(23,22,20,.58);
+    font-size: 14px;
+    line-height: 1.45;
+  }
+}
