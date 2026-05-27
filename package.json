@@ -1,0 +1,10 @@
+{
+  "name": "drift-weight-tracker-v2",
+  "version": "2.6.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@vercel/kv": "latest",
+    "web-push": "latest"
+  }
+}
