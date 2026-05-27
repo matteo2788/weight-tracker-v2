@@ -169,8 +169,128 @@
     font-weight: 650 !important;
   }
 
+  /* Last seven weigh-ins */
   .shell[data-screen-label="dashboard"] .recent-head {
-    margin-top: 12px !important;
+    margin-top: 20px !important;
+    margin-bottom: 18px !important;
+    padding-bottom: 18px !important;
+    border-bottom: 1px solid rgba(23,22,20,.08) !important;
+    align-items: flex-end !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .recent-head .t-eyebrow {
+    font-size: 11px !important;
+    letter-spacing: .18em !important;
+    color: rgba(23,22,20,.42) !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .recent-head .section-title {
+    font-size: clamp(30px, 8.5vw, 42px) !important;
+    line-height: .98 !important;
+    letter-spacing: -.045em !important;
+    max-width: 260px !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .recent-head .btn {
+    height: 38px !important;
+    padding: 0 14px !important;
+    font-size: 13px !important;
+    background: rgba(255,250,242,.46) !important;
+    border: 1px solid rgba(23,22,20,.08) !important;
+    border-radius: 999px !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .recent-list {
+    border-top: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .recent-row {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    grid-template-areas:
+      "day weight"
+      "note avg" !important;
+    gap: 8px 14px !important;
+    align-items: center !important;
+    padding: 15px 16px !important;
+    border: 1px solid rgba(23,22,20,.075) !important;
+    border-radius: 22px !important;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.28), rgba(255,255,255,0)),
+      rgba(255,250,242,.42) !important;
+    box-shadow: 0 10px 26px rgba(18,16,12,.04), inset 0 1px 0 rgba(255,255,255,.55) !important;
+    min-height: 86px !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .recent-row:hover {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.34), rgba(255,255,255,0)),
+      rgba(255,250,242,.54) !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .recent-day {
+    grid-area: day !important;
+    min-width: 0 !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .recent-weekday {
+    font-size: 16px !important;
+    font-weight: 620 !important;
+    line-height: 1.05 !important;
+    letter-spacing: -.02em !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .recent-date {
+    font-size: 11px !important;
+    margin-top: 5px !important;
+    color: rgba(23,22,20,.46) !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .recent-note {
+    grid-area: note !important;
+    font-size: 13px !important;
+    line-height: 1.25 !important;
+    color: rgba(23,22,20,.52) !important;
+    font-family: var(--font-sans) !important;
+    font-style: normal !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    min-width: 0 !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .recent-avg {
+    grid-area: avg !important;
+    text-align: right !important;
+    font-size: 12px !important;
+    color: rgba(23,22,20,.50) !important;
+    white-space: nowrap !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .recent-avg .t-label {
+    font-size: 10px !important;
+    letter-spacing: .08em !important;
+    color: rgba(23,22,20,.38) !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .recent-wt {
+    grid-area: weight !important;
+    text-align: right !important;
+    font-size: 30px !important;
+    line-height: .95 !important;
+    font-weight: 580 !important;
+    letter-spacing: -.055em !important;
+    white-space: nowrap !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .recent-wt .serif-i {
+    font-size: 14px !important;
+    color: rgba(23,22,20,.42) !important;
   }
 }
 
@@ -208,5 +328,23 @@
 
   .shell[data-screen-label="dashboard"] .stat-unit {
     font-size: 16px !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .recent-head {
+    align-items: flex-start !important;
+    gap: 14px !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .recent-head .section-title {
+    max-width: 230px !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .recent-row {
+    padding: 14px 14px !important;
+    border-radius: 20px !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .recent-wt {
+    font-size: 28px !important;
   }
 }
