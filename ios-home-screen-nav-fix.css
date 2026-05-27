@@ -2,7 +2,7 @@
 
 @media (max-width: 820px) {
   .mobile-clean-home-button {
-    position: fixed !important;
+    position: absolute !important;
     top: calc(env(safe-area-inset-top, 0px) + 16px) !important;
     left: 24px !important;
     z-index: 9998 !important;
@@ -14,7 +14,7 @@
   }
 
   .mobile-clean-menu-button {
-    position: fixed !important;
+    position: absolute !important;
     top: calc(env(safe-area-inset-top, 0px) + 10px) !important;
     right: 24px !important;
     z-index: 9999 !important;
@@ -23,7 +23,7 @@
   }
 
   .mobile-clean-menu {
-    position: fixed !important;
+    position: absolute !important;
     top: calc(env(safe-area-inset-top, 0px) + 66px) !important;
     z-index: 9997 !important;
   }
