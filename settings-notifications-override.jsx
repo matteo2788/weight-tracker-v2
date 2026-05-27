@@ -15,17 +15,19 @@
     const [reminderTime, setReminderTime] = useState(initialReminder.time || "08:00");
     const [backendSynced, setBackendSynced] = useState(initialReminder.backendSynced || false);
     const [permission, setPermission] = useState(reminderApi ? reminderApi.permission() : "unsupported");
-    const [notice, setNotice] = useState("");
+    const [notice, setNotice] = useState(initialReminder.lastSyncError || "");
     const [testing, setTesting] = useState(false);
+    const [backendTesting, setBackendTesting] = useState(false);
     const [syncing, setSyncing] = useState(false);
 
     useEffect(() => {
       const sync = () => {
-        const next = reminderApi ? reminderApi.load() : { enabled: false, time: "08:00", backendSynced: false };
+        const next = reminderApi ? reminderApi.load() : { enabled: false, time: "08:00", backendSynced: false, lastSyncError: "" };
         setReminder(next.enabled);
         setReminderTime(next.time || "08:00");
         setBackendSynced(next.backendSynced || false);
         setPermission(reminderApi ? reminderApi.permission() : "unsupported");
+        if (next.lastSyncError) setNotice(next.lastSyncError);
       };
       window.addEventListener("drift:reminder-updated", sync);
       sync();
@@ -116,6 +118,16 @@
       setNotice(ok ? "Test sent." : "Test could not send because notification permission is not allowed yet.");
     };
 
+    const testBackendNotification = async () => {
+      if (!reminderApi) return;
+      setBackendTesting(true);
+      const result = await reminderApi.testBackendNow();
+      setBackendTesting(false);
+      const latest = reminderApi.load();
+      setBackendSynced(!!latest.backendSynced);
+      setNotice(result.ok ? "Backend test sent. This proves closed-app push is connected." : `Backend test failed: ${result.error}`);
+    };
+
     const permissionLabel = permission === "granted" ? "Allowed" : permission === "denied" ? "Blocked" : permission === "unsupported" ? "Unsupported" : "Not allowed yet";
     const pushStatus = backendSynced ? "Automatic" : reminder ? "Local only" : "Off";
     const standaloneHint = reminderApi && !reminderApi.isStandalone()
@@ -153,7 +165,10 @@
                   <div style={{ fontSize: 15, color: "var(--ink)", fontWeight: 500 }}>Notification status</div>
                   <div style={{ fontSize: 13, color: "var(--ink-3)", marginTop: 4 }}>{permissionLabel} · {syncing ? "Syncing..." : pushStatus}</div>
                 </div>
-                <button className="btn btn-secondary" style={{ height: 34, fontSize: 12 }} onClick={testNotification}>{testing ? "Sending..." : "Test notification"}</button>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "flex-end" }}>
+                  <button className="btn btn-secondary" style={{ height: 34, fontSize: 12 }} onClick={testNotification}>{testing ? "Sending..." : "Test"}</button>
+                  <button className="btn btn-secondary" style={{ height: 34, fontSize: 12 }} onClick={testBackendNotification}>{backendTesting ? "Sending..." : "Backend test"}</button>
+                </div>
               </div>
               {notice && <div style={{ marginTop: 12, fontSize: 13, lineHeight: 1.4, color: "var(--ink-2)", background: "var(--card-soft)", border: "1px solid var(--line-soft)", padding: 12, borderRadius: 14 }}>{notice}</div>}
             </div>
