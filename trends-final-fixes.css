@@ -58,6 +58,7 @@
     max-width: 100% !important;
     padding-left: 20px !important;
     padding-right: 20px !important;
+    padding-top: 108px !important;
     box-sizing: border-box !important;
   }
 
@@ -68,19 +69,24 @@
     width: 100% !important;
     max-width: 100% !important;
     overflow: visible !important;
+    gap: 22px !important;
+    margin-bottom: 34px !important;
+    padding-bottom: 28px !important;
   }
 
   .shell[data-screen-label="trends"] .section-title {
     max-width: 100% !important;
-    font-size: clamp(40px, 11.8vw, 58px) !important;
+    font-size: clamp(44px, 12vw, 64px) !important;
     line-height: .94 !important;
-    letter-spacing: -.05em !important;
+    letter-spacing: -.052em !important;
     text-wrap: balance;
+    margin-top: 12px !important;
   }
 
   .shell[data-screen-label="trends"] .section-head .t-body {
     max-width: 100% !important;
     font-size: 15px !important;
+    line-height: 1.55 !important;
   }
 
   .shell[data-screen-label="trends"] .section-head .tabs {
@@ -99,15 +105,18 @@
     font-size: 12px !important;
   }
 
+  /* Mobile trend summary: align Average + Net Change like a clean stats header. */
   .shell[data-screen-label="trends"] .page-enter.container.section > .big-card > div:first-child,
   .shell[data-screen-label="trends"] main .big-card:first-of-type > div:first-child {
     width: 100% !important;
     max-width: 100% !important;
     display: grid !important;
-    grid-template-columns: 1fr !important;
-    gap: 18px !important;
-    align-items: start !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, .86fr) !important;
+    gap: 14px !important;
+    align-items: end !important;
     overflow: visible !important;
+    margin-bottom: 28px !important;
+    padding-bottom: 24px !important;
   }
 
   .shell[data-screen-label="trends"] .page-enter.container.section > .big-card > div:first-child > div,
@@ -115,26 +124,53 @@
     width: 100% !important;
     max-width: 100% !important;
     text-align: left !important;
+    min-width: 0 !important;
+  }
+
+  .shell[data-screen-label="trends"] .page-enter.container.section > .big-card > div:first-child > div:last-child,
+  .shell[data-screen-label="trends"] main .big-card:first-of-type > div:first-child > div:last-child {
+    text-align: right !important;
+  }
+
+  .shell[data-screen-label="trends"] .page-enter.container.section > .big-card > div:first-child > div:last-child > div:last-child,
+  .shell[data-screen-label="trends"] main .big-card:first-of-type > div:first-child > div:last-child > div:last-child {
+    justify-content: flex-end !important;
+  }
+
+  .shell[data-screen-label="trends"] .page-enter.container.section > .big-card .t-label,
+  .shell[data-screen-label="trends"] main .big-card:first-of-type .t-label {
+    font-size: 11px !important;
+    letter-spacing: .055em !important;
+    white-space: normal !important;
   }
 
   .shell[data-screen-label="trends"] .page-enter.container.section > .big-card .t-num-xl,
   .shell[data-screen-label="trends"] main .big-card:first-of-type .t-num-xl {
-    font-size: clamp(38px, 13vw, 56px) !important;
+    font-size: clamp(38px, 12.5vw, 58px) !important;
+    line-height: .92 !important;
+  }
+
+  .shell[data-screen-label="trends"] .page-enter.container.section > .big-card > div:first-child > div:last-child .t-num-xl,
+  .shell[data-screen-label="trends"] main .big-card:first-of-type > div:first-child > div:last-child .t-num-xl {
+    font-size: clamp(38px, 12vw, 54px) !important;
   }
 
   .shell[data-screen-label="trends"] .page-enter.container.section > .big-card > div:last-child,
   .shell[data-screen-label="trends"] main .big-card:first-of-type > div:last-child {
     width: 100% !important;
     max-width: 100% !important;
-    overflow: hidden !important;
+    overflow: visible !important;
+    padding-top: 0 !important;
+    margin-top: 4px !important;
   }
 
   .shell[data-screen-label="trends"] .page-enter.container.section > .big-card svg,
   .shell[data-screen-label="trends"] main .big-card:first-of-type svg {
     width: 100% !important;
     max-width: 100% !important;
-    height: 270px !important;
+    height: 310px !important;
     display: block !important;
+    overflow: visible !important;
   }
 
   .shell[data-screen-label="trends"] .grid.grid-4 {
@@ -142,6 +178,7 @@
     max-width: 100% !important;
     grid-template-columns: 1fr 1fr !important;
     overflow: hidden !important;
+    margin-top: 34px !important;
   }
 
   .shell[data-screen-label="trends"] .grid.grid-4 .card {
@@ -210,15 +247,41 @@
   .shell[data-screen-label="trends"] .page-enter.container.section {
     padding-left: 16px !important;
     padding-right: 16px !important;
+    padding-top: 102px !important;
   }
 
   .shell[data-screen-label="trends"] .section-title {
-    font-size: clamp(38px, 11.2vw, 52px) !important;
+    font-size: clamp(40px, 11.3vw, 56px) !important;
+    line-height: .95 !important;
+  }
+
+  .shell[data-screen-label="trends"] .section-head .t-body {
+    font-size: 14.5px !important;
+  }
+
+  .shell[data-screen-label="trends"] .page-enter.container.section > .big-card > div:first-child,
+  .shell[data-screen-label="trends"] main .big-card:first-of-type > div:first-child {
+    grid-template-columns: 1fr !important;
+    gap: 18px !important;
+  }
+
+  .shell[data-screen-label="trends"] .page-enter.container.section > .big-card > div:first-child > div:last-child,
+  .shell[data-screen-label="trends"] main .big-card:first-of-type > div:first-child > div:last-child {
+    display: flex !important;
+    align-items: flex-end !important;
+    justify-content: space-between !important;
+    text-align: left !important;
+    gap: 18px !important;
+  }
+
+  .shell[data-screen-label="trends"] .page-enter.container.section > .big-card > div:first-child > div:last-child > div:last-child,
+  .shell[data-screen-label="trends"] main .big-card:first-of-type > div:first-child > div:last-child > div:last-child {
+    justify-content: flex-end !important;
   }
 
   .shell[data-screen-label="trends"] .page-enter.container.section > .big-card svg,
   .shell[data-screen-label="trends"] main .big-card:first-of-type svg {
-    height: 250px !important;
+    height: 292px !important;
   }
 
   .shell[data-screen-label="trends"] .grid.grid-4 .card {
