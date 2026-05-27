@@ -7,6 +7,7 @@
     const ref = useRef(null);
     const [w, setW] = useState(900);
     const [hoverIdx, setHoverIdx] = useState(null);
+    const [isTouching, setIsTouching] = useState(false);
 
     useEffect(() => {
       if (!ref.current) return;
@@ -71,13 +72,44 @@
       return { idx, x: xAt(idx), label: window.fmtDate(data[idx].dateObj) };
     });
 
-    const onMove = (e) => {
-      if (mobile) return;
-      const rect = e.currentTarget.getBoundingClientRect();
-      const x = e.clientX - rect.left;
+    const updateIndexFromClientX = (clientX, target) => {
+      const rect = target.getBoundingClientRect();
+      const x = clientX - rect.left;
       const ratio = Math.max(0, Math.min(1, (x - padL) / innerW));
       const idx = Math.round(ratio * (data.length - 1));
       setHoverIdx(idx);
+    };
+
+    const onMove = (e) => {
+      updateIndexFromClientX(e.clientX, e.currentTarget);
+    };
+
+    const onPointerDown = (e) => {
+      if (!mobile) return;
+      setIsTouching(true);
+      updateIndexFromClientX(e.clientX, e.currentTarget);
+      if (e.currentTarget.setPointerCapture) {
+        try { e.currentTarget.setPointerCapture(e.pointerId); } catch (_) {}
+      }
+    };
+
+    const onPointerMove = (e) => {
+      if (!mobile || !isTouching) return;
+      e.preventDefault();
+      updateIndexFromClientX(e.clientX, e.currentTarget);
+    };
+
+    const onPointerUp = (e) => {
+      if (!mobile) return;
+      setIsTouching(false);
+      if (e.currentTarget.releasePointerCapture) {
+        try { e.currentTarget.releasePointerCapture(e.pointerId); } catch (_) {}
+      }
+    };
+
+    const onTouchMove = (e) => {
+      if (!mobile || !e.touches || !e.touches[0]) return;
+      updateIndexFromClientX(e.touches[0].clientX, e.currentTarget);
     };
 
     return (
@@ -86,9 +118,23 @@
           width={w}
           height={chartHeight}
           viewBox={`0 0 ${w} ${chartHeight}`}
-          onMouseMove={onMove}
-          onMouseLeave={() => setHoverIdx(null)}
-          style={{ display: "block", width: "100%", height: chartHeight, overflow: "visible", cursor: mobile ? "default" : "crosshair" }}
+          onMouseMove={mobile ? undefined : onMove}
+          onMouseLeave={() => !mobile && setHoverIdx(null)}
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={onPointerUp}
+          onPointerCancel={onPointerUp}
+          onTouchMove={onTouchMove}
+          style={{
+            display: "block",
+            width: "100%",
+            height: chartHeight,
+            overflow: "visible",
+            cursor: mobile ? "grab" : "crosshair",
+            touchAction: mobile ? "none" : "auto",
+            WebkitUserSelect: "none",
+            userSelect: "none",
+          }}
         >
           <defs>
             <linearGradient id="trendFillMobileSafe" x1="0" x2="0" y1="0" y2="1">
@@ -148,9 +194,21 @@
             const dy = yAt(data[hoverIdx].weight);
             return (
               <g>
-                <line x1={hx} x2={hx} y1={padT} y2={padT + innerH} stroke="var(--ink-4)" strokeDasharray="3 3"/>
-                <circle cx={hx} cy={dy} r="3.5" fill="var(--ink-4)"/>
-                <circle cx={hx} cy={hy} r="5" fill="var(--card)" stroke="var(--ink)" strokeWidth="2"/>
+                <line x1={hx} x2={hx} y1={padT} y2={padT + innerH} stroke="var(--ink-4)" strokeDasharray="3 3" opacity={mobile ? "0.8" : "1"}/>
+                <circle cx={hx} cy={dy} r={mobile ? "4" : "3.5"} fill="var(--ink-4)" opacity="0.9"/>
+                <circle cx={hx} cy={hy} r={mobile ? "6" : "5"} fill="var(--card)" stroke="var(--ink)" strokeWidth="2"/>
+                {mobile && (
+                  <text
+                    x={hx}
+                    y={Math.max(18, hy - 14)}
+                    fontSize="11"
+                    fill="var(--ink)"
+                    textAnchor="middle"
+                    style={{ fontVariantNumeric: "tabular-nums", fontWeight: 650 }}
+                  >
+                    {data[hoverIdx].avg7.toFixed(1)}
+                  </text>
+                )}
               </g>
             );
           })()}
@@ -158,15 +216,22 @@
 
         {hoverIdx != null && data[hoverIdx] && (() => {
           const hx = xAt(hoverIdx);
-          const left = Math.min(Math.max(hx - 80, 8), w - 168);
+          const left = mobile
+            ? Math.min(Math.max(hx - 82, 8), w - 172)
+            : Math.min(Math.max(hx - 80, 8), w - 168);
           return (
             <div style={{
-              position: "absolute", top: 8, left,
+              position: "absolute",
+              top: mobile ? 4 : 8,
+              left,
               background: "var(--ink)", color: "#fff",
-              borderRadius: 10, padding: "10px 12px",
+              borderRadius: mobile ? 14 : 10,
+              padding: mobile ? "9px 11px" : "10px 12px",
               fontSize: 12, lineHeight: 1.4,
               boxShadow: "var(--shadow-md)",
-              pointerEvents: "none", width: 160,
+              pointerEvents: "none",
+              width: mobile ? 164 : 160,
+              zIndex: 5,
             }}>
               <div style={{ opacity: 0.6, fontSize: 11, marginBottom: 4 }}>{window.fmtDateLong(data[hoverIdx].dateObj)}</div>
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 2 }}>
