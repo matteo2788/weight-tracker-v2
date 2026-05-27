@@ -1,13 +1,15 @@
 // Drift reminder notifications.
-// This enables permission requests, test notifications, and reliable in-session reminders.
+// Supports local test notifications and real backend Web Push reminders.
 (function () {
   const KEY = "drift-reminder-settings-v1";
+  const DEVICE_KEY = "drift-device-id-v1";
   let reminderTimer = null;
 
   const defaults = {
     enabled: false,
     time: "08:00",
     lastFiredDate: "",
+    backendSynced: false,
   };
 
   function load() {
@@ -16,6 +18,15 @@
     } catch (_) {
       return { ...defaults };
     }
+  }
+
+  function getDeviceId() {
+    let id = localStorage.getItem(DEVICE_KEY);
+    if (!id) {
+      id = (crypto && crypto.randomUUID) ? crypto.randomUUID() : `drift-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+      localStorage.setItem(DEVICE_KEY, id);
+    }
+    return id;
   }
 
   function save(next) {
@@ -42,11 +53,83 @@
   async function registerServiceWorker() {
     if (!("serviceWorker" in navigator)) return null;
     try {
-      return await navigator.serviceWorker.register("drift-notification-sw.js");
+      const reg = await navigator.serviceWorker.register("drift-notification-sw.js");
+      await navigator.serviceWorker.ready;
+      return reg;
     } catch (err) {
       console.warn("Drift notification service worker failed", err);
       return null;
     }
+  }
+
+  function urlBase64ToUint8Array(base64String) {
+    const padding = "=".repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
+    const rawData = atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
+    for (let i = 0; i < rawData.length; ++i) outputArray[i] = rawData.charCodeAt(i);
+    return outputArray;
+  }
+
+  async function getPushPublicKey() {
+    const res = await fetch("/api/reminders/vapid-public-key");
+    if (!res.ok) throw new Error("Could not load push public key");
+    const data = await res.json();
+    if (!data.publicKey) throw new Error("Missing push public key");
+    return data.publicKey;
+  }
+
+  async function syncBackendReminder(settings = load()) {
+    if (!("PushManager" in window) || !("serviceWorker" in navigator)) {
+      save({ backendSynced: false });
+      return { ok: false, error: "Push is not supported on this device." };
+    }
+
+    if (permission() !== "granted") {
+      save({ backendSynced: false });
+      return { ok: false, error: "Notification permission is not granted." };
+    }
+
+    const reg = await registerServiceWorker();
+    if (!reg) return { ok: false, error: "Service worker could not register." };
+
+    const publicKey = await getPushPublicKey();
+    const subscription = await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(publicKey),
+    });
+
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "America/Toronto";
+    const res = await fetch("/api/reminders/subscribe", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        deviceId: getDeviceId(),
+        subscription,
+        time: settings.time || "08:00",
+        timezone,
+      }),
+    });
+
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data.ok) {
+      save({ backendSynced: false });
+      return { ok: false, error: data.error || "Could not save reminder on server." };
+    }
+
+    save({ backendSynced: true });
+    return { ok: true };
+  }
+
+  async function disableBackendReminder() {
+    try {
+      await fetch("/api/reminders/unsubscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ deviceId: getDeviceId() }),
+      });
+    } catch (_) {}
+    save({ backendSynced: false });
   }
 
   async function requestPermission() {
@@ -84,8 +167,8 @@
       const result = await requestPermission();
       if (result !== "granted") return false;
     }
-    return showNotification("Log your weight", {
-      body: "",
+    return showNotification("Drift", {
+      body: "Log your weight",
       tag: "drift-test-notification",
     });
   }
@@ -114,7 +197,7 @@
       const fresh = load();
       const today = todayKey();
       if (fresh.enabled && fresh.lastFiredDate !== today && permission() === "granted") {
-        await showNotification("Log your weight");
+        await showNotification("Drift", { body: "Log your weight" });
         save({ lastFiredDate: today });
       } else {
         schedule();
@@ -131,6 +214,8 @@
     requestPermission,
     test,
     schedule,
+    syncBackendReminder,
+    disableBackendReminder,
   };
 
   window.addEventListener("load", schedule);
