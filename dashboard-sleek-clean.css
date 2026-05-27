@@ -1,0 +1,219 @@
+/* Dashboard sleek cleanup — reduce bubble/card feeling on mobile */
+
+@media (max-width: 820px) {
+  /* Keep the dashboard feeling editorial: typography, spacing, hairlines, fewer boxes. */
+  .shell[data-screen-label="dashboard"] .section.container {
+    padding-left: 18px !important;
+    padding-right: 18px !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .section-head {
+    margin-bottom: 30px !important;
+    padding-bottom: 22px !important;
+    border-bottom: 1px solid rgba(23, 22, 20, .09) !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .section-head .btn,
+  .shell[data-screen-label="dashboard"] .recent-head .btn {
+    background: transparent !important;
+    border: 1px solid rgba(23, 22, 20, .12) !important;
+    box-shadow: none !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .section-head .btn:hover,
+  .shell[data-screen-label="dashboard"] .recent-head .btn:hover {
+    background: rgba(23, 22, 20, .035) !important;
+  }
+
+  /* Trend headline: remove the big rounded bubble panel. */
+  .shell[data-screen-label="dashboard"] .trend-headline {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 22px !important;
+    margin-top: 16px !important;
+    padding: 0 0 24px !important;
+    border: 0 !important;
+    border-bottom: 1px solid rgba(23, 22, 20, .10) !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .trend-headline > div:first-child .t-label {
+    font-size: 13px !important;
+    color: rgba(23,22,20,.48) !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .trend-headline > div:first-child .t-num-xl {
+    font-size: clamp(60px, 19vw, 84px) !important;
+    line-height: .9 !important;
+    letter-spacing: -.076em !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .trend-headline-meta {
+    border-top: 0 !important;
+    padding-top: 2px !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .trend-meta-row {
+    padding: 13px 0 !important;
+    border-bottom: 1px solid rgba(23,22,20,.08) !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .trend-meta-row:last-child {
+    border-bottom: 0 !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .trend-chart-wrap {
+    margin-top: 12px !important;
+    padding: 18px 0 10px !important;
+    border-top: 0 !important;
+    border-bottom: 1px solid rgba(23,22,20,.10) !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .chart-legend {
+    border-bottom: 0 !important;
+    padding-bottom: 8px !important;
+  }
+
+  /* Metrics: remove 2x2 bubbles; use modern hairline rows. */
+  .shell[data-screen-label="dashboard"] .stat-row {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 0 !important;
+    border-top: 1px solid rgba(23,22,20,.10) !important;
+    border-bottom: 1px solid rgba(23,22,20,.10) !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .stat-cell {
+    min-height: 0 !important;
+    padding: 24px 0 22px !important;
+    border: 0 !important;
+    border-bottom: 1px solid rgba(23,22,20,.075) !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    grid-template-areas:
+      "label meta"
+      "value value" !important;
+    align-items: end !important;
+    gap: 10px 16px !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .stat-cell:last-child {
+    border: 0 !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .stat-cell .t-label {
+    grid-area: label !important;
+    font-size: 13px !important;
+    letter-spacing: .035em !important;
+    color: rgba(23,22,20,.50) !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .stat-val {
+    grid-area: value !important;
+    font-size: clamp(54px, 15vw, 74px) !important;
+    line-height: .9 !important;
+    letter-spacing: -.072em !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .stat-unit {
+    font-size: 22px !important;
+    color: rgba(23,22,20,.42) !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .stat-meta {
+    grid-area: meta !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+    align-items: baseline !important;
+    gap: 10px !important;
+    font-size: 13px !important;
+    text-align: right !important;
+    color: rgba(23,22,20,.48) !important;
+  }
+
+  /* Recent entries: remove individual pills/cards; use sleek list rows. */
+  .shell[data-screen-label="dashboard"] .recent-head {
+    margin-top: 18px !important;
+    margin-bottom: 10px !important;
+    padding-bottom: 20px !important;
+    border-bottom: 1px solid rgba(23,22,20,.10) !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .recent-list {
+    display: block !important;
+    border-top: 0 !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .recent-row {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    grid-template-areas:
+      "day weight"
+      "note avg" !important;
+    gap: 8px 16px !important;
+    min-height: 0 !important;
+    padding: 18px 0 !important;
+    border: 0 !important;
+    border-bottom: 1px solid rgba(23,22,20,.075) !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .recent-row:hover {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    background: transparent !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .recent-weekday {
+    font-size: 17px !important;
+    font-weight: 590 !important;
+    letter-spacing: -.02em !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .recent-date {
+    font-size: 11px !important;
+    color: rgba(23,22,20,.45) !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .recent-note {
+    font-size: 13px !important;
+    color: rgba(23,22,20,.50) !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .recent-wt {
+    font-size: 31px !important;
+    font-weight: 570 !important;
+    letter-spacing: -.06em !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .recent-avg {
+    font-size: 12px !important;
+    color: rgba(23,22,20,.48) !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .shell[data-screen-label="dashboard"] .section.container {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .trend-headline > div:first-child .t-num-xl {
+    font-size: clamp(56px, 18.5vw, 78px) !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .stat-val {
+    font-size: clamp(50px, 14.5vw, 68px) !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .recent-head .section-title {
+    max-width: 240px !important;
+  }
+}
