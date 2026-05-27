@@ -42,6 +42,17 @@
   .hero {
     padding-top: calc(env(safe-area-inset-top, 0px) + 96px) !important;
   }
+
+  /* All non-dashboard pages need top breathing room because the custom mobile nav is absolute. */
+  .shell:not([data-screen-label="dashboard"]) main > .container:first-child,
+  .shell:not([data-screen-label="dashboard"]) main > .section:first-child,
+  .shell:not([data-screen-label="dashboard"]) main > .goals-shell:first-child {
+    padding-top: calc(env(safe-area-inset-top, 0px) + 112px) !important;
+  }
+
+  .shell:not([data-screen-label="dashboard"]) main .section-head:first-child {
+    margin-top: 0 !important;
+  }
 }
 
 @media (max-width: 480px) {
@@ -61,5 +72,11 @@
 
   .hero {
     padding-top: calc(env(safe-area-inset-top, 0px) + 92px) !important;
+  }
+
+  .shell:not([data-screen-label="dashboard"]) main > .container:first-child,
+  .shell:not([data-screen-label="dashboard"]) main > .section:first-child,
+  .shell:not([data-screen-label="dashboard"]) main > .goals-shell:first-child {
+    padding-top: calc(env(safe-area-inset-top, 0px) + 104px) !important;
   }
 }
