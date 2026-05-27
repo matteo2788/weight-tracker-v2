@@ -1,163 +1,285 @@
-/* Dashboard sleek cleanup — reduce bubble/card feeling on mobile */
+/* Dashboard pro mobile direction — premium data console, not bubbles */
 
 @media (max-width: 820px) {
-  /* Keep the dashboard feeling editorial: typography, spacing, hairlines, fewer boxes. */
+  .shell[data-screen-label="dashboard"] main {
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.24), rgba(255,255,255,0) 360px),
+      radial-gradient(circle at 16% 10%, rgba(201,168,124,.12), transparent 34%),
+      #F4F0E8 !important;
+  }
+
   .shell[data-screen-label="dashboard"] .section.container {
     padding-left: 18px !important;
     padding-right: 18px !important;
   }
 
   .shell[data-screen-label="dashboard"] .section-head {
-    margin-bottom: 30px !important;
-    padding-bottom: 22px !important;
-    border-bottom: 1px solid rgba(23, 22, 20, .09) !important;
+    position: relative !important;
+    margin-bottom: 28px !important;
+    padding: 0 0 26px !important;
+    border-bottom: 1px solid rgba(23,22,20,.10) !important;
+    align-items: flex-end !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .section-head::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -1px;
+    width: 74px;
+    height: 2px;
+    background: #171614;
+    border-radius: 999px;
+  }
+
+  .shell[data-screen-label="dashboard"] .section-head .section-title {
+    max-width: 310px !important;
+    font-size: clamp(40px, 11.4vw, 58px) !important;
+    line-height: .93 !important;
+    letter-spacing: -.056em !important;
   }
 
   .shell[data-screen-label="dashboard"] .section-head .btn,
   .shell[data-screen-label="dashboard"] .recent-head .btn {
-    background: transparent !important;
-    border: 1px solid rgba(23, 22, 20, .12) !important;
-    box-shadow: none !important;
+    height: 42px !important;
+    padding: 0 16px !important;
+    border-radius: 14px !important;
+    background: rgba(23,22,20,.94) !important;
+    color: #F3EEE7 !important;
+    border: 1px solid rgba(23,22,20,.90) !important;
+    box-shadow: 0 14px 30px rgba(18,16,12,.12) !important;
   }
 
-  .shell[data-screen-label="dashboard"] .section-head .btn:hover,
-  .shell[data-screen-label="dashboard"] .recent-head .btn:hover {
-    background: rgba(23, 22, 20, .035) !important;
-  }
-
-  /* Trend headline: remove the big rounded bubble panel. */
+  /* Feature panel: angular editorial slab instead of a soft bubble. */
   .shell[data-screen-label="dashboard"] .trend-headline {
+    position: relative !important;
     display: grid !important;
     grid-template-columns: 1fr !important;
-    gap: 22px !important;
-    margin-top: 16px !important;
-    padding: 0 0 24px !important;
-    border: 0 !important;
-    border-bottom: 1px solid rgba(23, 22, 20, .10) !important;
-    border-radius: 0 !important;
-    background: transparent !important;
-    box-shadow: none !important;
+    gap: 18px !important;
+    margin-top: 18px !important;
+    padding: 24px 20px 20px !important;
+    border: 1px solid rgba(23,22,20,.12) !important;
+    border-left: 4px solid #171614 !important;
+    border-radius: 10px 26px 10px 26px !important;
+    background:
+      linear-gradient(135deg, rgba(255,255,255,.54), rgba(255,255,255,.06)),
+      linear-gradient(180deg, rgba(250,246,238,.74), rgba(244,240,232,.30)) !important;
+    box-shadow:
+      0 20px 48px rgba(18,16,12,.075),
+      inset 0 1px 0 rgba(255,255,255,.70) !important;
+    overflow: hidden !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .trend-headline::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(90deg, rgba(23,22,20,.045) 1px, transparent 1px),
+      linear-gradient(180deg, rgba(23,22,20,.035) 1px, transparent 1px);
+    background-size: 34px 34px;
+    mask-image: linear-gradient(135deg, rgba(0,0,0,.34), transparent 64%);
+    pointer-events: none;
+  }
+
+  .shell[data-screen-label="dashboard"] .trend-headline > * {
+    position: relative !important;
+    z-index: 1 !important;
   }
 
   .shell[data-screen-label="dashboard"] .trend-headline > div:first-child .t-label {
-    font-size: 13px !important;
-    color: rgba(23,22,20,.48) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    font-size: 12px !important;
+    letter-spacing: .095em !important;
+    text-transform: uppercase !important;
+    color: rgba(23,22,20,.50) !important;
+    margin-bottom: 10px !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .trend-headline > div:first-child .t-label::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    background: #4D6248;
+    box-shadow: 0 0 0 5px rgba(77,98,72,.10);
   }
 
   .shell[data-screen-label="dashboard"] .trend-headline > div:first-child .t-num-xl {
-    font-size: clamp(60px, 19vw, 84px) !important;
-    line-height: .9 !important;
-    letter-spacing: -.076em !important;
+    font-size: clamp(62px, 20vw, 90px) !important;
+    line-height: .86 !important;
+    letter-spacing: -.085em !important;
+    font-weight: 590 !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .trend-headline > div:first-child .serif-i {
+    font-size: 25px !important;
+    color: rgba(23,22,20,.42) !important;
   }
 
   .shell[data-screen-label="dashboard"] .trend-headline-meta {
-    border-top: 0 !important;
-    padding-top: 2px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 1px !important;
+    padding: 1px !important;
+    border-top: 1px solid rgba(23,22,20,.10) !important;
+    background: rgba(23,22,20,.08) !important;
   }
 
   .shell[data-screen-label="dashboard"] .trend-meta-row {
-    padding: 13px 0 !important;
-    border-bottom: 1px solid rgba(23,22,20,.08) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    justify-content: space-between !important;
+    min-height: 78px !important;
+    padding: 12px 10px !important;
+    border: 0 !important;
+    background: rgba(244,240,232,.84) !important;
   }
 
-  .shell[data-screen-label="dashboard"] .trend-meta-row:last-child {
-    border-bottom: 0 !important;
+  .shell[data-screen-label="dashboard"] .trend-meta-row .t-label {
+    font-size: 10px !important;
+    letter-spacing: .08em !important;
+    text-transform: uppercase !important;
+    color: rgba(23,22,20,.44) !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .t-num-meta {
+    font-size: 15px !important;
+    line-height: 1 !important;
+    font-weight: 650 !important;
+    letter-spacing: -.025em !important;
   }
 
   .shell[data-screen-label="dashboard"] .trend-chart-wrap {
-    margin-top: 12px !important;
-    padding: 18px 0 10px !important;
-    border-top: 0 !important;
-    border-bottom: 1px solid rgba(23,22,20,.10) !important;
-  }
-
-  .shell[data-screen-label="dashboard"] .chart-legend {
-    border-bottom: 0 !important;
-    padding-bottom: 8px !important;
-  }
-
-  /* Metrics: remove 2x2 bubbles; use modern hairline rows. */
-  .shell[data-screen-label="dashboard"] .stat-row {
-    display: grid !important;
-    grid-template-columns: 1fr !important;
-    gap: 0 !important;
+    position: relative !important;
+    margin-top: 26px !important;
+    padding: 16px 0 6px !important;
     border-top: 1px solid rgba(23,22,20,.10) !important;
     border-bottom: 1px solid rgba(23,22,20,.10) !important;
   }
 
-  .shell[data-screen-label="dashboard"] .stat-cell {
-    min-height: 0 !important;
-    padding: 24px 0 22px !important;
-    border: 0 !important;
-    border-bottom: 1px solid rgba(23,22,20,.075) !important;
-    border-radius: 0 !important;
-    background: transparent !important;
-    box-shadow: none !important;
-    display: grid !important;
-    grid-template-columns: minmax(0, 1fr) auto !important;
-    grid-template-areas:
-      "label meta"
-      "value value" !important;
-    align-items: end !important;
-    gap: 10px 16px !important;
+  .shell[data-screen-label="dashboard"] .trend-chart-wrap::before {
+    content: "Trend map";
+    display: block;
+    margin-bottom: 8px;
+    font-size: 10px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: rgba(23,22,20,.38);
   }
 
-  .shell[data-screen-label="dashboard"] .stat-cell:last-child {
+  .shell[data-screen-label="dashboard"] .chart-legend {
     border: 0 !important;
+    padding: 16px 0 4px !important;
+    font-size: 13px !important;
+    color: rgba(23,22,20,.58) !important;
+  }
+
+  /* Metrics: compact data tiles with hard edges, not pill bubbles. */
+  .shell[data-screen-label="dashboard"] .stat-row {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 1px !important;
+    padding: 1px !important;
+    border: 1px solid rgba(23,22,20,.11) !important;
+    background: rgba(23,22,20,.10) !important;
+    border-radius: 22px !important;
+    overflow: hidden !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .stat-cell {
+    min-height: 142px !important;
+    padding: 17px 14px 15px !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.40), rgba(255,255,255,0)),
+      rgba(250,246,238,.76) !important;
+    box-shadow: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    gap: 10px !important;
   }
 
   .shell[data-screen-label="dashboard"] .stat-cell .t-label {
-    grid-area: label !important;
-    font-size: 13px !important;
-    letter-spacing: .035em !important;
-    color: rgba(23,22,20,.50) !important;
+    font-size: 10.5px !important;
+    letter-spacing: .12em !important;
+    text-transform: uppercase !important;
+    color: rgba(23,22,20,.44) !important;
   }
 
   .shell[data-screen-label="dashboard"] .stat-val {
-    grid-area: value !important;
-    font-size: clamp(54px, 15vw, 74px) !important;
-    line-height: .9 !important;
-    letter-spacing: -.072em !important;
+    font-size: clamp(36px, 12vw, 54px) !important;
+    line-height: .86 !important;
+    letter-spacing: -.075em !important;
+    white-space: nowrap !important;
   }
 
   .shell[data-screen-label="dashboard"] .stat-unit {
-    font-size: 22px !important;
-    color: rgba(23,22,20,.42) !important;
+    font-size: 16px !important;
+    color: rgba(23,22,20,.40) !important;
   }
 
   .shell[data-screen-label="dashboard"] .stat-meta {
-    grid-area: meta !important;
-    display: flex !important;
-    justify-content: flex-end !important;
-    align-items: baseline !important;
-    gap: 10px !important;
-    font-size: 13px !important;
-    text-align: right !important;
-    color: rgba(23,22,20,.48) !important;
+    font-size: 11.5px !important;
+    line-height: 1.15 !important;
+    color: rgba(23,22,20,.46) !important;
   }
 
-  /* Recent entries: remove individual pills/cards; use sleek list rows. */
+  /* Recent entries: timeline ledger style. */
   .shell[data-screen-label="dashboard"] .recent-head {
-    margin-top: 18px !important;
-    margin-bottom: 10px !important;
-    padding-bottom: 20px !important;
+    position: relative !important;
+    margin-top: 20px !important;
+    margin-bottom: 12px !important;
+    padding-bottom: 22px !important;
     border-bottom: 1px solid rgba(23,22,20,.10) !important;
+    align-items: flex-end !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .recent-head::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -1px;
+    width: 56px;
+    height: 2px;
+    background: #171614;
+    border-radius: 999px;
   }
 
   .shell[data-screen-label="dashboard"] .recent-list {
+    position: relative !important;
     display: block !important;
-    border-top: 0 !important;
+    border: 0 !important;
+    padding-left: 18px !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .recent-list::before {
+    content: "";
+    position: absolute;
+    left: 4px;
+    top: 17px;
+    bottom: 17px;
+    width: 1px;
+    background: rgba(23,22,20,.12);
   }
 
   .shell[data-screen-label="dashboard"] .recent-row {
+    position: relative !important;
     display: grid !important;
     grid-template-columns: minmax(0, 1fr) auto !important;
     grid-template-areas:
       "day weight"
       "note avg" !important;
-    gap: 8px 16px !important;
+    gap: 7px 16px !important;
     min-height: 0 !important;
-    padding: 18px 0 !important;
+    padding: 17px 0 17px 2px !important;
     border: 0 !important;
     border-bottom: 1px solid rgba(23,22,20,.075) !important;
     border-radius: 0 !important;
@@ -165,37 +287,65 @@
     box-shadow: none !important;
   }
 
+  .shell[data-screen-label="dashboard"] .recent-row::before {
+    content: "";
+    position: absolute;
+    left: -18px;
+    top: 24px;
+    width: 9px;
+    height: 9px;
+    border-radius: 999px;
+    background: #F4F0E8;
+    border: 2px solid rgba(23,22,20,.72);
+    box-shadow: 0 0 0 5px #F4F0E8;
+  }
+
   .shell[data-screen-label="dashboard"] .recent-row:hover {
-    padding-left: 0 !important;
+    padding-left: 2px !important;
     padding-right: 0 !important;
     background: transparent !important;
   }
 
   .shell[data-screen-label="dashboard"] .recent-weekday {
     font-size: 17px !important;
-    font-weight: 590 !important;
-    letter-spacing: -.02em !important;
+    line-height: 1.05 !important;
+    font-weight: 620 !important;
+    letter-spacing: -.025em !important;
   }
 
   .shell[data-screen-label="dashboard"] .recent-date {
     font-size: 11px !important;
-    color: rgba(23,22,20,.45) !important;
+    margin-top: 5px !important;
+    color: rgba(23,22,20,.42) !important;
   }
 
   .shell[data-screen-label="dashboard"] .recent-note {
-    font-size: 13px !important;
-    color: rgba(23,22,20,.50) !important;
+    font-family: var(--font-sans) !important;
+    font-style: normal !important;
+    font-size: 12.5px !important;
+    line-height: 1.2 !important;
+    color: rgba(23,22,20,.48) !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
   }
 
   .shell[data-screen-label="dashboard"] .recent-wt {
-    font-size: 31px !important;
-    font-weight: 570 !important;
-    letter-spacing: -.06em !important;
+    font-size: 32px !important;
+    line-height: .92 !important;
+    font-weight: 590 !important;
+    letter-spacing: -.065em !important;
+    text-align: right !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .recent-wt .serif-i {
+    font-size: 14px !important;
+    color: rgba(23,22,20,.40) !important;
   }
 
   .shell[data-screen-label="dashboard"] .recent-avg {
-    font-size: 12px !important;
-    color: rgba(23,22,20,.48) !important;
+    font-size: 11.5px !important;
+    color: rgba(23,22,20,.46) !important;
   }
 }
 
@@ -205,15 +355,40 @@
     padding-right: 16px !important;
   }
 
+  .shell[data-screen-label="dashboard"] .trend-headline {
+    padding: 22px 16px 18px !important;
+    border-radius: 8px 24px 8px 24px !important;
+  }
+
   .shell[data-screen-label="dashboard"] .trend-headline > div:first-child .t-num-xl {
-    font-size: clamp(56px, 18.5vw, 78px) !important;
+    font-size: clamp(56px, 18.5vw, 80px) !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .trend-headline-meta {
+    grid-template-columns: 1fr !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .trend-meta-row {
+    min-height: 56px !important;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    align-items: center !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .stat-row {
+    border-radius: 20px !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .stat-cell {
+    min-height: 134px !important;
+    padding: 15px 13px 14px !important;
   }
 
   .shell[data-screen-label="dashboard"] .stat-val {
-    font-size: clamp(50px, 14.5vw, 68px) !important;
+    font-size: clamp(33px, 11vw, 48px) !important;
   }
 
   .shell[data-screen-label="dashboard"] .recent-head .section-title {
-    max-width: 240px !important;
+    max-width: 238px !important;
   }
 }
