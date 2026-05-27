@@ -1,0 +1,107 @@
+/* Dashboard alignment fixes — loaded last */
+
+@media (max-width: 820px) {
+  /* Stop section headers from drifting/centering on mobile. */
+  .shell[data-screen-label="dashboard"] .section-head,
+  .shell[data-screen-label="dashboard"] .recent-head {
+    width: 100% !important;
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    justify-items: start !important;
+    align-items: start !important;
+    text-align: left !important;
+    gap: 16px !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .section-head > div,
+  .shell[data-screen-label="dashboard"] .recent-head > div {
+    width: 100% !important;
+    max-width: 100% !important;
+    text-align: left !important;
+    justify-self: start !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .section-head .t-eyebrow,
+  .shell[data-screen-label="dashboard"] .recent-head .t-eyebrow {
+    display: block !important;
+    text-align: left !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .section-head .section-title,
+  .shell[data-screen-label="dashboard"] .recent-head .section-title {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    text-align: left !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .section-head .btn,
+  .shell[data-screen-label="dashboard"] .recent-head .btn {
+    justify-self: start !important;
+    align-self: start !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  /* Keep the trend feature card aligned to the same left edge. */
+  .shell[data-screen-label="dashboard"] .trend-headline {
+    width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .trend-headline > div:first-child {
+    text-align: left !important;
+  }
+
+  /* Make the small stat row inside the main trend card align cleanly. */
+  .shell[data-screen-label="dashboard"] .trend-headline-meta {
+    align-items: stretch !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .trend-meta-row {
+    text-align: left !important;
+  }
+
+  /* Recent rows: make all text sit on a reliable grid. */
+  .shell[data-screen-label="dashboard"] .recent-row {
+    grid-template-columns: minmax(0, 1fr) max-content !important;
+    align-items: center !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .recent-day,
+  .shell[data-screen-label="dashboard"] .recent-note {
+    min-width: 0 !important;
+    text-align: left !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .recent-wt,
+  .shell[data-screen-label="dashboard"] .recent-avg {
+    text-align: right !important;
+    justify-self: end !important;
+  }
+
+  /* Add a little more separation after the floating card carousel so the next section doesn't feel jammed. */
+  .shell[data-screen-label="dashboard"] .hero {
+    padding-bottom: 42px !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .stage-scroll {
+    margin-bottom: 20px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .shell[data-screen-label="dashboard"] .section-head,
+  .shell[data-screen-label="dashboard"] .recent-head {
+    gap: 14px !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .section-head .section-title,
+  .shell[data-screen-label="dashboard"] .recent-head .section-title {
+    font-size: clamp(38px, 11vw, 52px) !important;
+  }
+}
