@@ -62,7 +62,7 @@
     if (!isSupported() || Notification.permission !== "granted") return false;
     const reg = await registerServiceWorker();
     const payload = {
-      body: "A calm 20-second weigh-in keeps the trend honest.",
+      body: "",
       tag: "drift-daily-weigh-in",
       renotify: true,
       badge: "/",
@@ -84,8 +84,8 @@
       const result = await requestPermission();
       if (result !== "granted") return false;
     }
-    return showNotification("Time to log your weigh-in", {
-      body: "This is your Drift reminder test. If you see this, notifications are allowed.",
+    return showNotification("Log your weight", {
+      body: "",
       tag: "drift-test-notification",
     });
   }
@@ -114,7 +114,7 @@
       const fresh = load();
       const today = todayKey();
       if (fresh.enabled && fresh.lastFiredDate !== today && permission() === "granted") {
-        await showNotification("Time to log your weigh-in");
+        await showNotification("Log your weight");
         save({ lastFiredDate: today });
       } else {
         schedule();
