@@ -41,28 +41,71 @@
     const max = Math.max(...values);
     const span = Math.max(1, max - min);
 
-    // The important part: compress visual movement hard.
-    // Weight can trend down, but the bars should feel calm and editorial, not like a crash chart.
-    const minHeight = 68;
-    const maxHeight = 96;
+    // Compress movement hard: tiny weekly weight changes should not look like a dramatic crash.
+    const minHeight = 74;
+    const maxHeight = 104;
     const heightFor = (value) => {
       const normalized = span === 0 ? 0.5 : (value - min) / span;
       return minHeight + normalized * (maxHeight - minHeight);
     };
 
     return (
-      <div className="weekly-bars weekly-bars-soft" aria-label="Weekly average weight chart">
+      <div
+        aria-label="Weekly average weight chart"
+        style={{
+          display: "flex",
+          alignItems: "flex-end",
+          gap: 10,
+          height: 168,
+          width: "100%",
+          paddingTop: 14,
+          overflow: "visible",
+        }}
+      >
         {points.map((point, index) => {
           const isLatest = index === points.length - 1;
           return (
-            <div className="weekly-bar-item" key={`${point.label}-${index}`}>
-              <div className="weekly-bar-value">{point.avg.toFixed(1)}</div>
+            <div
+              key={`${point.label}-${index}`}
+              style={{
+                flex: 1,
+                minWidth: 0,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "flex-end",
+                gap: 8,
+              }}
+            >
+              <div style={{
+                fontSize: 11,
+                lineHeight: 1,
+                color: "var(--ink-3)",
+                fontVariantNumeric: "tabular-nums",
+                whiteSpace: "nowrap",
+              }}>
+                {point.avg.toFixed(1)}
+              </div>
               <div
-                className={`weekly-bar ${isLatest ? "current" : ""}`}
-                style={{ height: `${heightFor(point.avg)}px` }}
                 title={`${point.label}: ${point.avg.toFixed(1)} lb`}
+                style={{
+                  width: "100%",
+                  height: `${heightFor(point.avg)}px`,
+                  background: isLatest ? "var(--ink)" : "rgba(255, 255, 255, 0.34)",
+                  border: isLatest ? "none" : "1px solid rgba(23, 22, 20, 0.10)",
+                  borderRadius: 999,
+                  boxSizing: "border-box",
+                  transition: "height 220ms ease",
+                }}
               />
-              <div className="weekly-bar-label">{point.label}</div>
+              <div style={{
+                fontSize: 10,
+                lineHeight: 1,
+                color: "var(--ink-3)",
+                whiteSpace: "nowrap",
+              }}>
+                {point.label}
+              </div>
             </div>
           );
         })}
