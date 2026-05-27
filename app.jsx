@@ -104,21 +104,6 @@ const App = () => {
         {screen === "settings" && <Drift.SettingsScreen/>}
       </main>
 
-      <footer style={{ borderTop: "1px solid var(--line-soft)", marginTop: 80 }}>
-        <div className="container" style={{ display: "flex", justifyContent: "space-between", padding: "32px 40px", color: "var(--ink-3)", fontSize: 13 }}>
-          <div className="row gap-3">
-            <span className="logo" style={{ fontSize: 18 }}>Drift<span className="logo-dot" style={{ width: 4, height: 4, top: -7 }}/></span>
-            <span style={{ marginLeft: 12 }}>The quiet weight tracker</span>
-          </div>
-          <div className="row gap-6">
-            <span>v 2.5</span>
-            <span>{window.fmtDateLong(window.DriftData.today)}</span>
-            <span>·</span>
-            <span>Saved locally</span>
-          </div>
-        </div>
-      </footer>
-
       <Drift.LogWeightModal
         open={logOpen}
         onClose={() => { setLogOpen(false); setEditingEntry(null); }}
