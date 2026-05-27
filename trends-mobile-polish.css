@@ -1,0 +1,160 @@
+/* Mobile Trends polish — loaded after all Trends files */
+
+@media (max-width: 820px) {
+  .shell[data-screen-label="trends"] .page-enter.container.section {
+    padding-top: 96px !important;
+  }
+
+  .shell[data-screen-label="trends"] .section-head {
+    margin-bottom: 28px !important;
+    padding-bottom: 22px !important;
+  }
+
+  .shell[data-screen-label="trends"] .section-title {
+    font-size: clamp(38px, 10.8vw, 56px) !important;
+    line-height: .96 !important;
+    letter-spacing: -.05em !important;
+  }
+
+  .shell[data-screen-label="trends"] .section-head .t-body {
+    font-size: 14.5px !important;
+    line-height: 1.5 !important;
+  }
+
+  .shell[data-screen-label="trends"] .trends-range-tabs {
+    position: relative !important;
+    top: auto !important;
+    margin-top: 4px !important;
+  }
+
+  .shell[data-screen-label="trends"] .trends-chart-card {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+  }
+
+  .shell[data-screen-label="trends"] .trends-summary-strip {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0 !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    margin: 0 0 30px !important;
+    padding: 22px 0 24px !important;
+    border-top: 1px solid rgba(23, 22, 20, .10) !important;
+    border-bottom: 1px solid rgba(23, 22, 20, .10) !important;
+  }
+
+  .shell[data-screen-label="trends"] .trend-summary-item {
+    min-width: 0 !important;
+    padding: 0 14px !important;
+  }
+
+  .shell[data-screen-label="trends"] .trend-summary-item.average {
+    padding-left: 0 !important;
+    border-right: 1px solid rgba(23, 22, 20, .10) !important;
+  }
+
+  .shell[data-screen-label="trends"] .trend-summary-item.change {
+    padding-right: 0 !important;
+    text-align: right !important;
+  }
+
+  .shell[data-screen-label="trends"] .trend-summary-item .t-label {
+    font-size: 10.5px !important;
+    letter-spacing: .03em !important;
+    line-height: 1.1 !important;
+    color: rgba(23, 22, 20, .52) !important;
+    margin-bottom: 12px !important;
+  }
+
+  .shell[data-screen-label="trends"] .trend-summary-value {
+    display: flex !important;
+    align-items: baseline !important;
+    gap: 5px !important;
+    min-width: 0 !important;
+  }
+
+  .shell[data-screen-label="trends"] .trend-summary-item.change .trend-summary-value {
+    justify-content: flex-end !important;
+  }
+
+  .shell[data-screen-label="trends"] .trend-summary-value .t-num-xl {
+    font-size: clamp(42px, 12vw, 56px) !important;
+    line-height: .9 !important;
+    letter-spacing: -.07em !important;
+    white-space: nowrap !important;
+  }
+
+  .shell[data-screen-label="trends"] .trend-summary-item.change .trend-summary-value .t-num-xl {
+    font-size: clamp(38px, 11vw, 52px) !important;
+  }
+
+  .shell[data-screen-label="trends"] .trend-summary-value .serif-i {
+    font-size: 17px !important;
+    color: rgba(23, 22, 20, .48) !important;
+  }
+
+  .shell[data-screen-label="trends"] .trend-chart-wrap {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: visible !important;
+    padding: 0 0 64px !important;
+    margin: 0 !important;
+  }
+
+  .shell[data-screen-label="trends"] .trend-chart-wrap svg {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 330px !important;
+    overflow: visible !important;
+    display: block !important;
+  }
+
+  .shell[data-screen-label="trends"] .trends-metric-grid {
+    margin-top: 10px !important;
+    clear: both !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .shell[data-screen-label="trends"] .page-enter.container.section {
+    padding-top: 92px !important;
+  }
+
+  .shell[data-screen-label="trends"] .section-title {
+    font-size: clamp(36px, 10.5vw, 50px) !important;
+  }
+
+  .shell[data-screen-label="trends"] .trends-summary-strip {
+    padding: 20px 0 22px !important;
+    margin-bottom: 26px !important;
+  }
+
+  .shell[data-screen-label="trends"] .trend-summary-item {
+    padding: 0 10px !important;
+  }
+
+  .shell[data-screen-label="trends"] .trend-summary-item.average {
+    padding-left: 0 !important;
+  }
+
+  .shell[data-screen-label="trends"] .trend-summary-item.change {
+    padding-right: 0 !important;
+  }
+
+  .shell[data-screen-label="trends"] .trend-summary-value .t-num-xl {
+    font-size: clamp(38px, 11vw, 50px) !important;
+  }
+
+  .shell[data-screen-label="trends"] .trend-summary-item.change .trend-summary-value .t-num-xl {
+    font-size: clamp(34px, 10.2vw, 46px) !important;
+  }
+
+  .shell[data-screen-label="trends"] .trend-chart-wrap {
+    padding-bottom: 70px !important;
+  }
+
+  .shell[data-screen-label="trends"] .trend-chart-wrap svg {
+    height: 320px !important;
+  }
+}
