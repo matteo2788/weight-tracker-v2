@@ -13,15 +13,18 @@
     const [goal, setGoal] = useState("172.0");
     const [reminder, setReminder] = useState(initialReminder.enabled);
     const [reminderTime, setReminderTime] = useState(initialReminder.time || "08:00");
+    const [backendSynced, setBackendSynced] = useState(initialReminder.backendSynced || false);
     const [permission, setPermission] = useState(reminderApi ? reminderApi.permission() : "unsupported");
     const [notice, setNotice] = useState("");
     const [testing, setTesting] = useState(false);
+    const [syncing, setSyncing] = useState(false);
 
     useEffect(() => {
       const sync = () => {
-        const next = reminderApi ? reminderApi.load() : { enabled: false, time: "08:00" };
+        const next = reminderApi ? reminderApi.load() : { enabled: false, time: "08:00", backendSynced: false };
         setReminder(next.enabled);
         setReminderTime(next.time || "08:00");
+        setBackendSynced(next.backendSynced || false);
         setPermission(reminderApi ? reminderApi.permission() : "unsupported");
       };
       window.addEventListener("drift:reminder-updated", sync);
@@ -53,38 +56,55 @@
         return;
       }
 
+      setSyncing(true);
       const result = await reminderApi.requestPermission();
       setPermission(result);
 
       if (result === "granted") {
         reminderApi.save({ enabled: true, time: reminderTime });
         setReminder(true);
-        setNotice("Reminder is on. Tap Test notification to confirm your iPhone allows Drift alerts.");
+
+        const backend = await reminderApi.syncBackendReminder({ ...reminderApi.load(), enabled: true, time: reminderTime });
+        setBackendSynced(!!backend.ok);
+        setNotice(backend.ok
+          ? `Automatic reminders are on for ${reminderTime}. You do not need to press Test.`
+          : `Local reminder is on, but automatic closed-app reminders need setup: ${backend.error}`);
       } else if (result === "denied") {
-        reminderApi.save({ enabled: false });
+        reminderApi.save({ enabled: false, backendSynced: false });
         setReminder(false);
+        setBackendSynced(false);
         setNotice("Notifications are blocked. On iPhone, open Settings > Notifications and allow Drift notifications.");
       } else {
-        reminderApi.save({ enabled: false });
+        reminderApi.save({ enabled: false, backendSynced: false });
         setReminder(false);
+        setBackendSynced(false);
         setNotice("Permission was not granted yet. Tap the reminder again when you are ready to allow notifications.");
       }
+      setSyncing(false);
     };
 
     const toggleReminder = async () => {
       if (reminder) {
-        reminderApi && reminderApi.save({ enabled: false });
+        reminderApi && reminderApi.save({ enabled: false, backendSynced: false });
+        reminderApi && reminderApi.disableBackendReminder();
         setReminder(false);
+        setBackendSynced(false);
         setNotice("Daily reminder is off.");
       } else {
         await enableReminder();
       }
     };
 
-    const changeReminderTime = (value) => {
+    const changeReminderTime = async (value) => {
       setReminderTime(value);
       reminderApi && reminderApi.save({ time: value, enabled: reminder });
-      if (reminder) setNotice(`Daily reminder set for ${value}.`);
+      if (reminder && reminderApi) {
+        setSyncing(true);
+        const backend = await reminderApi.syncBackendReminder({ ...reminderApi.load(), time: value, enabled: true });
+        setBackendSynced(!!backend.ok);
+        setNotice(backend.ok ? `Automatic reminder set for ${value}.` : `Time saved locally, but server sync failed: ${backend.error}`);
+        setSyncing(false);
+      }
     };
 
     const testNotification = async () => {
@@ -93,13 +113,14 @@
       const ok = await reminderApi.test();
       setTesting(false);
       setPermission(reminderApi.permission());
-      setNotice(ok ? "Test sent. If it did not pop up, check iPhone notification settings for Drift." : "Test could not send because notification permission is not allowed yet.");
+      setNotice(ok ? "Test sent." : "Test could not send because notification permission is not allowed yet.");
     };
 
     const permissionLabel = permission === "granted" ? "Allowed" : permission === "denied" ? "Blocked" : permission === "unsupported" ? "Unsupported" : "Not allowed yet";
+    const pushStatus = backendSynced ? "Automatic" : reminder ? "Local only" : "Off";
     const standaloneHint = reminderApi && !reminderApi.isStandalone()
       ? "For iPhone notifications, add Drift to your Home Screen first, then open it from that Home Screen icon."
-      : "Works best when Drift is opened from your iPhone Home Screen.";
+      : "Once enabled, Drift will try to send the reminder automatically at your saved time.";
 
     return (
       <div className="page-enter container section">
@@ -122,7 +143,7 @@
             <Row label="Daily reminder" hint={`A gentle nudge at your chosen time. ${standaloneHint}`}>
               <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap", justifyContent: "flex-end" }}>
                 <input className="input" type="time" value={reminderTime} onChange={e => changeReminderTime(e.target.value)} style={{ width: 112, height: 38, fontSize: 13 }}/>
-                <div className={`toggle ${reminder ? "on" : ""}`} onClick={toggleReminder}><div className="toggle-knob"/></div>
+                <div className={`toggle ${reminder ? "on" : ""}`} onClick={syncing ? undefined : toggleReminder}><div className="toggle-knob"/></div>
               </div>
             </Row>
 
@@ -130,7 +151,7 @@
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
                 <div>
                   <div style={{ fontSize: 15, color: "var(--ink)", fontWeight: 500 }}>Notification status</div>
-                  <div style={{ fontSize: 13, color: "var(--ink-3)", marginTop: 4 }}>{permissionLabel}</div>
+                  <div style={{ fontSize: 13, color: "var(--ink-3)", marginTop: 4 }}>{permissionLabel} · {syncing ? "Syncing..." : pushStatus}</div>
                 </div>
                 <button className="btn btn-secondary" style={{ height: 34, fontSize: 12 }} onClick={testNotification}>{testing ? "Sending..." : "Test notification"}</button>
               </div>
