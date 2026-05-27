@@ -10,6 +10,7 @@
     time: "08:00",
     lastFiredDate: "",
     backendSynced: false,
+    lastSyncError: "",
   };
 
   function load() {
@@ -23,7 +24,7 @@
   function getDeviceId() {
     let id = localStorage.getItem(DEVICE_KEY);
     if (!id) {
-      id = (crypto && crypto.randomUUID) ? crypto.randomUUID() : `drift-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+      id = (window.crypto && window.crypto.randomUUID) ? window.crypto.randomUUID() : `drift-${Date.now()}-${Math.random().toString(16).slice(2)}`;
       localStorage.setItem(DEVICE_KEY, id);
     }
     return id;
@@ -72,53 +73,71 @@
   }
 
   async function getPushPublicKey() {
-    const res = await fetch("/api/reminders/vapid-public-key");
-    if (!res.ok) throw new Error("Could not load push public key");
+    const res = await fetch("/api/reminders/vapid-public-key", { cache: "no-store" });
+    if (!res.ok) throw new Error(`Could not load push public key (${res.status})`);
     const data = await res.json();
-    if (!data.publicKey) throw new Error("Missing push public key");
+    if (!data.publicKey) throw new Error("Missing VAPID_PUBLIC_KEY on Vercel.");
     return data.publicKey;
   }
 
-  async function syncBackendReminder(settings = load()) {
-    if (!("PushManager" in window) || !("serviceWorker" in navigator)) {
-      save({ backendSynced: false });
-      return { ok: false, error: "Push is not supported on this device." };
-    }
+  async function getOrCreateSubscription(reg, publicKey) {
+    const existing = await reg.pushManager.getSubscription();
+    if (existing) return existing;
 
-    if (permission() !== "granted") {
-      save({ backendSynced: false });
-      return { ok: false, error: "Notification permission is not granted." };
-    }
-
-    const reg = await registerServiceWorker();
-    if (!reg) return { ok: false, error: "Service worker could not register." };
-
-    const publicKey = await getPushPublicKey();
-    const subscription = await reg.pushManager.subscribe({
+    return reg.pushManager.subscribe({
       userVisibleOnly: true,
       applicationServerKey: urlBase64ToUint8Array(publicKey),
     });
+  }
 
-    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "America/Toronto";
-    const res = await fetch("/api/reminders/subscribe", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        deviceId: getDeviceId(),
-        subscription,
-        time: settings.time || "08:00",
-        timezone,
-      }),
-    });
+  async function syncBackendReminder(settings = load()) {
+    try {
+      if (!("PushManager" in window) || !("serviceWorker" in navigator)) {
+        save({ backendSynced: false, lastSyncError: "Push is not supported on this device." });
+        return { ok: false, error: "Push is not supported on this device." };
+      }
 
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok || !data.ok) {
-      save({ backendSynced: false });
-      return { ok: false, error: data.error || "Could not save reminder on server." };
+      if (permission() !== "granted") {
+        save({ backendSynced: false, lastSyncError: "Notification permission is not granted." });
+        return { ok: false, error: "Notification permission is not granted." };
+      }
+
+      const reg = await registerServiceWorker();
+      if (!reg) {
+        save({ backendSynced: false, lastSyncError: "Service worker could not register." });
+        return { ok: false, error: "Service worker could not register." };
+      }
+
+      const publicKey = await getPushPublicKey();
+      const subscription = await getOrCreateSubscription(reg, publicKey);
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "America/Toronto";
+
+      const res = await fetch("/api/reminders/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          deviceId: getDeviceId(),
+          subscription: subscription.toJSON ? subscription.toJSON() : subscription,
+          time: settings.time || "08:00",
+          timezone,
+        }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.ok) {
+        const error = data.error || `Could not save reminder on server (${res.status}).`;
+        save({ backendSynced: false, lastSyncError: error });
+        return { ok: false, error };
+      }
+
+      save({ backendSynced: true, lastSyncError: "" });
+      return { ok: true };
+    } catch (err) {
+      const error = err && err.message ? err.message : "Unknown sync error.";
+      console.warn("Drift backend reminder sync failed:", err);
+      save({ backendSynced: false, lastSyncError: error });
+      return { ok: false, error };
     }
-
-    save({ backendSynced: true });
-    return { ok: true };
   }
 
   async function disableBackendReminder() {
@@ -129,7 +148,7 @@
         body: JSON.stringify({ deviceId: getDeviceId() }),
       });
     } catch (_) {}
-    save({ backendSynced: false });
+    save({ backendSynced: false, lastSyncError: "" });
   }
 
   async function requestPermission() {
@@ -173,6 +192,20 @@
     });
   }
 
+  async function testBackendNow() {
+    const sync = await syncBackendReminder(load());
+    if (!sync.ok) return sync;
+
+    const res = await fetch("/api/reminders/test-send", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ deviceId: getDeviceId() }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data.ok) return { ok: false, error: data.error || `Backend test failed (${res.status}).` };
+    return { ok: true };
+  }
+
   function msUntilNext(time) {
     const [h, m] = String(time || "08:00").split(":").map(Number);
     const now = new Date();
@@ -213,6 +246,7 @@
     isStandalone,
     requestPermission,
     test,
+    testBackendNow,
     schedule,
     syncBackendReminder,
     disableBackendReminder,
