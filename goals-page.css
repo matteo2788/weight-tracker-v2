@@ -232,6 +232,16 @@
   margin-bottom: 8px;
 }
 
+.goals-field input {
+  max-width: 100%;
+}
+
+.goals-field input[type="date"] {
+  width: 190px;
+  max-width: 100%;
+  text-align: left;
+}
+
 .goals-actions {
   display: flex;
   gap: 10px;
@@ -299,6 +309,10 @@
     margin-top: 0;
     font-size: 24px;
   }
+
+  .goals-field input[type="date"] {
+    width: min(220px, 100%);
+  }
 }
 
 @media (max-width: 480px) {
@@ -324,5 +338,10 @@
 
   .goals-milestone > div:last-child {
     grid-column: 2;
+  }
+
+  .goals-field input[type="date"] {
+    width: 100%;
+    max-width: 220px;
   }
 }
