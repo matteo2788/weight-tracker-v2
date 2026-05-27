@@ -1,0 +1,212 @@
+/* Dashboard mobile polish — trend block + metric grid */
+
+@media (max-width: 820px) {
+  .shell[data-screen-label="dashboard"] main {
+    overflow-x: hidden;
+  }
+
+  /* Trend preview section */
+  .shell[data-screen-label="dashboard"] .section.container {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .section-head {
+    align-items: flex-start !important;
+    gap: 22px !important;
+    margin-bottom: 28px !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .section-head .section-title {
+    max-width: 92% !important;
+    font-size: clamp(42px, 11.5vw, 58px) !important;
+    line-height: .94 !important;
+    letter-spacing: -.05em !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .section-head .btn {
+    height: 46px !important;
+    padding: 0 20px !important;
+    font-size: 15px !important;
+    box-shadow: 0 10px 24px rgba(18, 16, 12, .06), inset 0 1px 0 rgba(255,255,255,.74) !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .trend-headline {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 18px !important;
+    padding: 22px 18px 18px !important;
+    margin-top: 18px !important;
+    border: 1px solid rgba(23, 22, 20, .08) !important;
+    border-radius: 28px !important;
+    background:
+      radial-gradient(circle at 88% 14%, rgba(201, 168, 124, .16), transparent 30%),
+      rgba(255, 250, 242, .58) !important;
+    box-shadow: 0 18px 45px rgba(18, 16, 12, .055), inset 0 1px 0 rgba(255,255,255,.64) !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .trend-headline > div:first-child .t-label {
+    font-size: 13px !important;
+    letter-spacing: .035em !important;
+    color: rgba(23,22,20,.50) !important;
+    margin-bottom: 10px !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .trend-headline > div:first-child .t-num-xl {
+    font-size: clamp(58px, 19vw, 82px) !important;
+    line-height: .9 !important;
+    letter-spacing: -.075em !important;
+    font-weight: 560 !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .trend-headline > div:first-child .serif-i {
+    font-size: 24px !important;
+    color: rgba(23,22,20,.42) !important;
+    margin-left: 2px !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .trend-headline-meta {
+    min-width: 0 !important;
+    width: 100% !important;
+    gap: 0 !important;
+    padding-top: 4px !important;
+    border-top: 1px solid rgba(23,22,20,.08) !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .trend-meta-row {
+    padding: 12px 0 !important;
+    border-bottom: 1px solid rgba(23,22,20,.075) !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .trend-meta-row:last-child {
+    border-bottom: 0 !important;
+    padding-bottom: 4px !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .trend-meta-row .t-label {
+    font-size: 14px !important;
+    letter-spacing: .015em !important;
+    color: rgba(23,22,20,.48) !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .t-num-meta {
+    font-size: 15px !important;
+    font-weight: 620 !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .trend-chart-wrap {
+    margin-top: 22px !important;
+    padding: 18px 0 8px !important;
+    border-top: 1px solid rgba(23,22,20,.08) !important;
+    border-bottom: 1px solid rgba(23,22,20,.08) !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .trend-chart-wrap svg {
+    height: 300px !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .chart-legend {
+    padding: 18px 0 0 !important;
+    gap: 22px !important;
+    font-size: 14px !important;
+    color: rgba(23,22,20,.62) !important;
+    border-bottom: 1px solid rgba(23,22,20,.08) !important;
+    padding-bottom: 18px !important;
+  }
+
+  /* Metric section: convert long stacked rows into a compact 2x2 mobile panel. */
+  .shell[data-screen-label="dashboard"] .stat-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+    border: 0 !important;
+    padding: 0 !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .stat-cell {
+    min-height: 160px !important;
+    padding: 18px 16px 16px !important;
+    border: 1px solid rgba(23,22,20,.08) !important;
+    border-radius: 24px !important;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.30), rgba(255,255,255,0)),
+      rgba(255, 250, 242, .44) !important;
+    box-shadow: 0 12px 30px rgba(18, 16, 12, .045), inset 0 1px 0 rgba(255,255,255,.55) !important;
+    gap: 12px !important;
+    justify-content: space-between !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .stat-cell:last-child {
+    border-right: 1px solid rgba(23,22,20,.08) !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .stat-cell .t-label {
+    font-size: 12px !important;
+    letter-spacing: .045em !important;
+    color: rgba(23,22,20,.48) !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .stat-val {
+    font-size: clamp(37px, 12vw, 52px) !important;
+    line-height: .92 !important;
+    letter-spacing: -.065em !important;
+    white-space: nowrap !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .stat-unit {
+    font-size: 18px !important;
+    color: rgba(23,22,20,.42) !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .stat-meta {
+    font-size: 12px !important;
+    line-height: 1.15 !important;
+    gap: 8px !important;
+    color: rgba(23,22,20,.48) !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .stat-meta .delta-down,
+  .shell[data-screen-label="dashboard"] .stat-meta .delta-up {
+    font-weight: 650 !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .recent-head {
+    margin-top: 12px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .shell[data-screen-label="dashboard"] .section-head .section-title {
+    font-size: clamp(40px, 11.7vw, 54px) !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .trend-headline {
+    padding: 20px 16px 16px !important;
+    border-radius: 26px !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .trend-headline > div:first-child .t-num-xl {
+    font-size: clamp(54px, 18.5vw, 76px) !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .trend-chart-wrap svg {
+    height: 284px !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .stat-row {
+    gap: 9px !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .stat-cell {
+    min-height: 150px !important;
+    padding: 16px 14px 14px !important;
+    border-radius: 22px !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .stat-val {
+    font-size: clamp(34px, 11.8vw, 48px) !important;
+  }
+
+  .shell[data-screen-label="dashboard"] .stat-unit {
+    font-size: 16px !important;
+  }
+}
