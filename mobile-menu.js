@@ -1,5 +1,14 @@
 (function () {
+  function loadMobileModalPolish() {
+    if (document.querySelector('link[href="log-modal-mobile-polish.css"]')) return;
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'log-modal-mobile-polish.css';
+    document.head.appendChild(link);
+  }
+
   function setupMobileMenu() {
+    loadMobileModalPolish();
     if (document.querySelector('.mobile-clean-menu-button')) return;
 
     const homeButton = document.createElement('button');
