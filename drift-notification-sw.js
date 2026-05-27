@@ -23,9 +23,9 @@ self.addEventListener('push', function (event) {
     data = {};
   }
 
-  const title = data.title || 'Time to log your weigh-in';
+  const title = data.title || 'Drift';
   const options = {
-    body: data.body || 'A calm 20-second weigh-in keeps the trend honest.',
+    body: data.body || 'Log your weight',
     tag: data.tag || 'drift-daily-weigh-in',
     renotify: true,
     data: { url: data.url || '/' },
