@@ -17,6 +17,7 @@ function getLocalTimeParts(date, timezone) {
     timeZone: timezone || 'America/Toronto',
     hour: '2-digit',
     minute: '2-digit',
+    second: '2-digit',
     hour12: false,
   }).formatToParts(date);
 
@@ -24,24 +25,28 @@ function getLocalTimeParts(date, timezone) {
   return {
     hour: Number(map.hour),
     minute: Number(map.minute),
+    second: Number(map.second || 0),
   };
 }
 
 export function secondsUntilNextReminder(time = '08:00', timezone = 'America/Toronto') {
   const now = new Date();
-  const { hour, minute } = getLocalTimeParts(now, timezone);
+  const { hour, minute, second } = getLocalTimeParts(now, timezone);
   const [targetH, targetM] = String(time || '08:00').split(':').map(Number);
 
-  const nowMinutes = hour * 60 + minute;
-  const targetMinutes = (Number.isFinite(targetH) ? targetH : 8) * 60 + (Number.isFinite(targetM) ? targetM : 0);
-  let delayMinutes = targetMinutes - nowMinutes;
+  const nowSeconds = hour * 3600 + minute * 60 + second;
+  const targetSeconds = (Number.isFinite(targetH) ? targetH : 8) * 3600 + (Number.isFinite(targetM) ? targetM : 0) * 60;
+  let delaySeconds = targetSeconds - nowSeconds;
 
-  if (delayMinutes <= 0) delayMinutes += 24 * 60;
+  // If the selected minute is the current minute, schedule shortly instead of waiting until tomorrow.
+  // This makes quick tests like 12:08 while it is already 12:08 still fire.
+  if (delaySeconds <= 0 && delaySeconds > -60) delaySeconds = 75;
+  if (delaySeconds <= -60) delaySeconds += 24 * 3600;
 
-  return Math.max(60, delayMinutes * 60);
+  return Math.max(60, delaySeconds);
 }
 
-export async function scheduleNextReminder(req, reminder) {
+export async function scheduleNextReminder(req, reminder, overrideDelaySeconds = null) {
   const token = process.env.QSTASH_TOKEN;
   if (!token) {
     return { ok: false, error: 'Missing QSTASH_TOKEN. Add Upstash QStash to enable closed-app automatic reminders.' };
@@ -56,9 +61,9 @@ export async function scheduleNextReminder(req, reminder) {
 
   await kv.set(`drift:reminder:${reminder.deviceId}`, nextReminder);
 
-  const delaySeconds = secondsUntilNextReminder(reminder.time, reminder.timezone);
+  const delaySeconds = overrideDelaySeconds || secondsUntilNextReminder(reminder.time, reminder.timezone);
   const destination = `${getBaseUrl(req)}/api/reminders/send-device`;
-  const publishUrl = `https://qstash.upstash.io/v2/publish/${encodeURIComponent(destination)}`;
+  const publishUrl = `https://qstash.upstash.io/v2/publish/${destination}`;
 
   const qstashRes = await fetch(publishUrl, {
     method: 'POST',
@@ -78,7 +83,7 @@ export async function scheduleNextReminder(req, reminder) {
   if (!qstashRes.ok) {
     const message = data.error || data.message || `QStash schedule failed (${qstashRes.status})`;
     await kv.set(`drift:reminder:${reminder.deviceId}`, { ...nextReminder, scheduleError: message });
-    return { ok: false, error: message };
+    return { ok: false, error: message, status: qstashRes.status };
   }
 
   await kv.set(`drift:reminder:${reminder.deviceId}`, {
@@ -88,5 +93,5 @@ export async function scheduleNextReminder(req, reminder) {
     scheduleError: '',
   });
 
-  return { ok: true, delaySeconds, messageId: data.messageId || '' };
+  return { ok: true, delaySeconds, messageId: data.messageId || data.deduplicatedMessageId || '' };
 }
