@@ -1,5 +1,6 @@
 (function () {
-  const STORAGE_KEY = 'drift-weight-entries-v1';
+  const STORAGE_KEY = 'drift-weight-entries-v2';
+  const OLD_KEYS = ['drift-weight-entries-v1'];
 
   function todayDate() {
     const d = new Date();
@@ -10,6 +11,7 @@
   function toKey(value) {
     const d = typeof value === 'string' ? new Date(value + 'T00:00:00') : new Date(value);
     d.setHours(0, 0, 0, 0);
+    if (Number.isNaN(d.getTime())) return null;
     return d.toISOString().slice(0, 10);
   }
 
@@ -19,6 +21,7 @@
       const weight = Number(entry.weight);
       if (!Number.isFinite(weight) || weight <= 0) return;
       const date = toKey(entry.date || entry.dateObj || todayDate());
+      if (!date) return;
       map.set(date, {
         date: date,
         weight: Math.round(weight * 10) / 10,
@@ -33,11 +36,16 @@
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) return cleanEntries(JSON.parse(saved));
     } catch (error) {}
-    return cleanEntries((window.DriftData && window.DriftData.entries) || []);
+    return [];
   }
 
   function writeEntries(entries) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(cleanEntries(entries)));
+  }
+
+  function removeAllStoredWeightData() {
+    localStorage.removeItem(STORAGE_KEY);
+    OLD_KEYS.forEach(function (key) { localStorage.removeItem(key); });
   }
 
   function buildData(entriesInput) {
@@ -55,13 +63,7 @@
         if (baseMap.has(key)) win.push(baseMap.get(key).weight);
       }
       const avg7 = win.length ? Math.round((win.reduce(function (a, b) { return a + b; }, 0) / win.length) * 100) / 100 : e.weight;
-      return {
-        date: e.date,
-        dateObj: d,
-        weight: e.weight,
-        note: e.note || '',
-        avg7: avg7
-      };
+      return { date: e.date, dateObj: d, weight: e.weight, note: e.note || '', avg7: avg7 };
     });
 
     const byDate = new Map(rolling.map(function (e) { return [e.date, e]; }));
@@ -90,8 +92,8 @@
 
     const weeklyAvg = avg(weekData, latest.weight);
     const prevWeeklyAvg = avg(prevWeekData, weeklyAvg);
-    const monthHigh = last30.length ? Math.max.apply(null, last30.map(function (e) { return e.weight; })) : latest.weight;
-    const monthLow = last30.length ? Math.min.apply(null, last30.map(function (e) { return e.weight; })) : latest.weight;
+    const monthHigh = last30.length ? Math.max.apply(null, last30.map(function (e) { return e.weight; })) : 0;
+    const monthLow = last30.length ? Math.min.apply(null, last30.map(function (e) { return e.weight; })) : 0;
 
     return {
       entries: rolling,
@@ -112,34 +114,83 @@
         monthLow: monthLow,
         streak: streak,
         daysLogged: rolling.length,
-        daysTotal: Math.max(120, rolling.length),
+        daysTotal: rolling.length,
         avgRatePerWeek: Math.round(((latest.avg7 - monthAgo.avg7) / 4) * 100) / 100
       }
     };
   }
 
+  function parseImportText(text) {
+    const rows = String(text || '').split(/\r?\n/).map(function (line) { return line.trim(); }).filter(Boolean);
+    const parsed = [];
+    const rejected = [];
+
+    rows.forEach(function (line, index) {
+      const cleaned = line.replace(/[|\t;]/g, ',');
+      const parts = cleaned.split(',').map(function (p) { return p.trim().replace(/^"|"$/g, ''); }).filter(Boolean);
+      let date = null;
+      let weight = null;
+      let note = '';
+
+      if (parts.length >= 2) {
+        date = toKey(parts[0]);
+        weight = Number(String(parts[1]).replace(/[^0-9.\-]/g, ''));
+        note = parts.slice(2).join(', ');
+      } else {
+        const match = line.match(/(\d{4}[-/]\d{1,2}[-/]\d{1,2}|[A-Za-z]{3,9}\s+\d{1,2}(?:,\s*\d{4})?)\s*[-–:,]?\s*(\d+(?:\.\d+)?)/);
+        if (match) {
+          const rawDate = match[1];
+          const hasYear = /\d{4}/.test(rawDate);
+          date = toKey(hasYear ? rawDate : rawDate + ', ' + new Date().getFullYear());
+          weight = Number(match[2]);
+          note = line.slice(match.index + match[0].length).trim().replace(/^[-–:,]\s*/, '');
+        }
+      }
+
+      if (!date || !Number.isFinite(weight) || weight <= 0) rejected.push({ line: index + 1, text: line });
+      else parsed.push({ date, weight: Math.round(weight * 10) / 10, note });
+    });
+
+    return { entries: cleanEntries(parsed), rejected };
+  }
+
+  function replaceAll(entries) {
+    const clean = cleanEntries(entries);
+    writeEntries(clean);
+    window.DriftData = buildData(clean);
+    window.dispatchEvent(new CustomEvent('drift:data-updated'));
+    return window.DriftData;
+  }
+
   window.DriftStore = {
-    getEntries: function () {
-      return readEntries();
-    },
+    getEntries: function () { return readEntries(); },
     saveEntry: function (entry) {
       const weight = Number(entry.weight);
       if (!Number.isFinite(weight) || weight <= 0) throw new Error('Please enter a valid weight.');
       const date = toKey(entry.date || todayDate());
+      if (!date) throw new Error('Please enter a valid date.');
       const entries = readEntries();
       const next = { date: date, weight: Math.round(weight * 10) / 10, note: entry.note || '' };
       const idx = entries.findIndex(function (e) { return e.date === date; });
       if (idx >= 0) entries[idx] = next;
       else entries.push(next);
-      const clean = cleanEntries(entries);
-      writeEntries(clean);
-      window.DriftData = buildData(clean);
+      return replaceAll(entries);
+    },
+    importEntries: function (entries, mode) {
+      const imported = cleanEntries(entries);
+      if (mode === 'merge') return replaceAll(readEntries().concat(imported));
+      return replaceAll(imported);
+    },
+    parseImportText: parseImportText,
+    clearAll: function () {
+      removeAllStoredWeightData();
+      window.DriftData = buildData([]);
       window.dispatchEvent(new CustomEvent('drift:data-updated'));
       return window.DriftData;
     },
     resetDemo: function () {
-      localStorage.removeItem(STORAGE_KEY);
-      window.DriftData = buildData((window.DriftData && window.DriftData.entries) || []);
+      removeAllStoredWeightData();
+      window.DriftData = buildData([]);
       window.dispatchEvent(new CustomEvent('drift:data-updated'));
       return window.DriftData;
     },
@@ -155,7 +206,5 @@
     buildData: buildData
   };
 
-  const initial = readEntries();
-  writeEntries(initial);
-  window.DriftData = buildData(initial);
+  window.DriftData = buildData(readEntries());
 })();
