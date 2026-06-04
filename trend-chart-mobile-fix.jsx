@@ -1,4 +1,4 @@
-// Mobile-safe TrendChart override
+// Mobile-safe TrendChart override with softer edges
 (function () {
   const { useEffect, useRef, useState } = React;
 
@@ -19,7 +19,6 @@
       return () => ro.disconnect();
     }, []);
 
-    // Clear the tooltip when the user taps/clicks anywhere outside the chart.
     useEffect(() => {
       const clearWhenOutside = (event) => {
         if (!ref.current) return;
@@ -28,10 +27,8 @@
           setIsTouching(false);
         }
       };
-
       document.addEventListener("pointerdown", clearWhenOutside, true);
       document.addEventListener("touchstart", clearWhenOutside, true);
-
       return () => {
         document.removeEventListener("pointerdown", clearWhenOutside, true);
         document.removeEventListener("touchstart", clearWhenOutside, true);
@@ -42,21 +39,24 @@
 
     const mobile = w < 560;
     const chartHeight = mobile ? Math.max(330, height - 20) : height;
-    const padL = mobile ? 68 : 56;
-    const padR = mobile ? 14 : 24;
-    const padT = mobile ? 30 : 24;
+    const padL = mobile ? 58 : 56;
+    const padR = mobile ? 18 : 30;
+    const padT = mobile ? 30 : 28;
     const padB = mobile ? 64 : 44;
-    const innerW = Math.max(20, w - padL - padR);
+    const edgeBreathingRoom = mobile ? 18 : 28;
+    const plotLeft = padL + edgeBreathingRoom;
+    const plotRight = w - padR - edgeBreathingRoom;
+    const innerW = Math.max(40, plotRight - plotLeft);
     const innerH = Math.max(80, chartHeight - padT - padB);
 
     const weights = data.map(d => d.weight);
     const avgs = data.map(d => d.avg7);
     const all = weights.concat(avgs).filter(Number.isFinite);
-    const min = Math.floor(Math.min(...all) - 0.6);
-    const max = Math.ceil(Math.max(...all) + 0.6);
+    const min = Math.floor(Math.min(...all) - 0.7);
+    const max = Math.ceil(Math.max(...all) + 0.7);
     const span = max - min || 1;
 
-    const xAt = (i) => padL + (i * innerW) / (data.length - 1 || 1);
+    const xAt = (i) => plotLeft + (i * innerW) / (data.length - 1 || 1);
     const yAt = (v) => padT + (1 - (v - min) / span) * innerH;
 
     const buildSmooth = (vals) => {
@@ -94,15 +94,12 @@
     const updateIndexFromClientX = (clientX, target) => {
       const rect = target.getBoundingClientRect();
       const x = clientX - rect.left;
-      const ratio = Math.max(0, Math.min(1, (x - padL) / innerW));
+      const ratio = Math.max(0, Math.min(1, (x - plotLeft) / innerW));
       const idx = Math.round(ratio * (data.length - 1));
       setHoverIdx(idx);
     };
 
-    const onMove = (e) => {
-      updateIndexFromClientX(e.clientX, e.currentTarget);
-    };
-
+    const onMove = (e) => updateIndexFromClientX(e.clientX, e.currentTarget);
     const onPointerDown = (e) => {
       if (!mobile) return;
       setIsTouching(true);
@@ -111,13 +108,11 @@
         try { e.currentTarget.setPointerCapture(e.pointerId); } catch (_) {}
       }
     };
-
     const onPointerMove = (e) => {
       if (!mobile || !isTouching) return;
       e.preventDefault();
       updateIndexFromClientX(e.clientX, e.currentTarget);
     };
-
     const onPointerUp = (e) => {
       if (!mobile) return;
       setIsTouching(false);
@@ -125,14 +120,15 @@
         try { e.currentTarget.releasePointerCapture(e.pointerId); } catch (_) {}
       }
     };
-
     const onTouchMove = (e) => {
       if (!mobile || !e.touches || !e.touches[0]) return;
       updateIndexFromClientX(e.touches[0].clientX, e.currentTarget);
     };
 
+    const softStroke = mobile ? 15 : 18;
+
     return (
-      <div ref={ref} className="trend-chart-fixed" style={{ position: "relative", width: "100%" }}>
+      <div ref={ref} className="trend-chart-fixed trend-chart-polished" style={{ position: "relative", width: "100%" }}>
         <svg
           width={w}
           height={chartHeight}
@@ -156,8 +152,14 @@
           }}
         >
           <defs>
-            <linearGradient id="trendFillMobileSafe" x1="0" x2="0" y1="0" y2="1">
-              <stop offset="0%" stopColor="var(--ink)" stopOpacity="0.09"/>
+            <filter id="trendSoftGlow" x="-8%" y="-18%" width="116%" height="136%">
+              <feGaussianBlur stdDeviation="7" result="blur"/>
+              <feColorMatrix in="blur" type="matrix" values="0 0 0 0 0.06 0 0 0 0 0.06 0 0 0 0 0.06 0 0 0 .16 0"/>
+            </filter>
+            <linearGradient id="trendLineFade" x1="0" x2="1" y1="0" y2="0">
+              <stop offset="0%" stopColor="var(--ink)" stopOpacity="0"/>
+              <stop offset="7%" stopColor="var(--ink)" stopOpacity="1"/>
+              <stop offset="93%" stopColor="var(--ink)" stopOpacity="1"/>
               <stop offset="100%" stopColor="var(--ink)" stopOpacity="0"/>
             </linearGradient>
           </defs>
@@ -180,31 +182,19 @@
             </g>
           ))}
 
-          <path
-            d={`${avgPath.d} L ${avgPath.xs[avgPath.xs.length - 1]} ${padT + innerH} L ${avgPath.xs[0]} ${padT + innerH} Z`}
-            fill="url(#trendFillMobileSafe)"
-          />
+          {/* soft halo instead of hard area fill, so the chart never has boxy cut-off sides */}
+          <path d={avgPath.d} fill="none" stroke="var(--ink)" strokeWidth={softStroke} strokeLinecap="round" strokeLinejoin="round" opacity="0.055" filter="url(#trendSoftGlow)"/>
+          <path d={avgPath.d} fill="none" stroke="var(--ink)" strokeWidth={mobile ? 8 : 10} strokeLinecap="round" strokeLinejoin="round" opacity="0.045"/>
 
           {data.map((d, i) => (
             <circle key={i} cx={xAt(i)} cy={yAt(d.weight)} r={mobile ? 1.8 : 2} fill="var(--ink-4)" opacity="0.48" />
           ))}
 
-          <path d={avgPath.d} fill="none" stroke="var(--ink)" strokeWidth={mobile ? 2.2 : 2} strokeLinecap="round"/>
+          <path d={avgPath.d} fill="none" stroke="url(#trendLineFade)" strokeWidth={mobile ? 2.6 : 2.35} strokeLinecap="round" strokeLinejoin="round"/>
 
           {showAxes && xLabels.map((l, i) => {
             const anchor = mobile && i === 0 ? "start" : mobile && i === xLabels.length - 1 ? "end" : "middle";
-            return (
-              <text
-                key={i}
-                x={l.x}
-                y={chartHeight - 22}
-                fontSize={mobile ? 10 : 11}
-                fill="var(--ink-3)"
-                textAnchor={anchor}
-              >
-                {l.label}
-              </text>
-            );
+            return <text key={i} x={l.x} y={chartHeight - 22} fontSize={mobile ? 10 : 11} fill="var(--ink-3)" textAnchor={anchor}>{l.label}</text>;
           })}
 
           {hoverIdx != null && data[hoverIdx] && (() => {
@@ -217,14 +207,7 @@
                 <circle cx={hx} cy={dy} r={mobile ? "4" : "3.5"} fill="var(--ink-4)" opacity="0.9"/>
                 <circle cx={hx} cy={hy} r={mobile ? "6" : "5"} fill="var(--card)" stroke="var(--ink)" strokeWidth="2"/>
                 {mobile && (
-                  <text
-                    x={hx}
-                    y={Math.max(18, hy - 14)}
-                    fontSize="11"
-                    fill="var(--ink)"
-                    textAnchor="middle"
-                    style={{ fontVariantNumeric: "tabular-nums", fontWeight: 650 }}
-                  >
+                  <text x={hx} y={Math.max(18, hy - 14)} fontSize="11" fill="var(--ink)" textAnchor="middle" style={{ fontVariantNumeric: "tabular-nums", fontWeight: 650 }}>
                     {data[hoverIdx].avg7.toFixed(1)}
                   </text>
                 )}
@@ -235,22 +218,16 @@
 
         {hoverIdx != null && data[hoverIdx] && (() => {
           const hx = xAt(hoverIdx);
-          const left = mobile
-            ? Math.min(Math.max(hx - 82, 8), w - 172)
-            : Math.min(Math.max(hx - 80, 8), w - 168);
+          const left = mobile ? Math.min(Math.max(hx - 82, 8), w - 172) : Math.min(Math.max(hx - 80, 8), w - 168);
           return (
             <div style={{
-              position: "absolute",
-              top: mobile ? 4 : 8,
-              left,
+              position: "absolute", top: mobile ? 4 : 8, left,
               background: "var(--ink)", color: "#fff",
               borderRadius: mobile ? 14 : 10,
               padding: mobile ? "9px 11px" : "10px 12px",
               fontSize: 12, lineHeight: 1.4,
               boxShadow: "var(--shadow-md)",
-              pointerEvents: "none",
-              width: mobile ? 164 : 160,
-              zIndex: 5,
+              pointerEvents: "none", width: mobile ? 164 : 160, zIndex: 5,
             }}>
               <div style={{ opacity: 0.6, fontSize: 11, marginBottom: 4 }}>{window.fmtDateLong(data[hoverIdx].dateObj)}</div>
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 2 }}>
