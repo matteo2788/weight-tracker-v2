@@ -7,11 +7,59 @@ const App = () => {
   const [editingEntry, setEditingEntry] = useStateApp(null);
   const [menuOpen, setMenuOpen] = useStateApp(false);
   const [dataVersion, setDataVersion] = useStateApp(0);
+  const [dailyPromptOpen, setDailyPromptOpen] = useStateApp(false);
+
+  const todayKey = () => window.DriftStore && window.DriftStore.todayKey ? window.DriftStore.todayKey() : new Date().toISOString().slice(0, 10);
+  const promptKey = () => `drift-daily-prompt-seen-${todayKey()}`;
+
+  const maybeShowDailyPrompt = () => {
+    if (!window.DriftStore || typeof window.DriftStore.hasLoggedToday !== "function") return;
+    if (window.DriftStore.hasLoggedToday()) return;
+    if (sessionStorage.getItem(promptKey()) === "1") return;
+    sessionStorage.setItem(promptKey(), "1");
+    setDailyPromptOpen(true);
+  };
 
   useEffectApp(() => {
-    const refresh = () => setDataVersion(v => v + 1);
+    const refresh = () => {
+      if (window.DriftStore && typeof window.DriftStore.buildData === "function" && typeof window.DriftStore.getEntries === "function") {
+        window.DriftData = window.DriftStore.buildData(window.DriftStore.getEntries());
+      }
+      setDataVersion(v => v + 1);
+    };
     window.addEventListener("drift:data-updated", refresh);
     return () => window.removeEventListener("drift:data-updated", refresh);
+  }, []);
+
+  useEffectApp(() => {
+    maybeShowDailyPrompt();
+    const tick = setInterval(() => {
+      if (window.DriftStore && typeof window.DriftStore.buildData === "function" && typeof window.DriftStore.getEntries === "function") {
+        const before = window.DriftData && window.DriftData.todayKey;
+        window.DriftData = window.DriftStore.buildData(window.DriftStore.getEntries());
+        const after = window.DriftData && window.DriftData.todayKey;
+        if (before !== after) {
+          setDataVersion(v => v + 1);
+          maybeShowDailyPrompt();
+        }
+      }
+    }, 60000);
+    const onVisible = () => {
+      if (!document.hidden) {
+        if (window.DriftStore && typeof window.DriftStore.buildData === "function" && typeof window.DriftStore.getEntries === "function") {
+          window.DriftData = window.DriftStore.buildData(window.DriftStore.getEntries());
+          setDataVersion(v => v + 1);
+        }
+        maybeShowDailyPrompt();
+      }
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    window.addEventListener("focus", onVisible);
+    return () => {
+      clearInterval(tick);
+      document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("focus", onVisible);
+    };
   }, []);
 
   const navItems = [
@@ -28,13 +76,23 @@ const App = () => {
     setLogOpen(true);
   };
 
+  const openTodayLog = () => {
+    setDailyPromptOpen(false);
+    setEditingEntry(null);
+    setLogOpen(true);
+  };
+
   const goTo = (id) => { setScreen(id); setMenuOpen(false); window.scrollTo(0, 0); };
 
   const handleSaveEntry = (entry) => {
     if (!window.DriftStore || typeof window.DriftStore.saveEntry !== "function") return;
     window.DriftStore.saveEntry(entry);
+    setDailyPromptOpen(false);
     setDataVersion(v => v + 1);
   };
+
+  const D = window.DriftData;
+  const needsTodayLog = D && !D.hasTodayEntry;
 
   return (
     <div className="shell" data-screen-label={screen} data-data-version={dataVersion}>
@@ -59,7 +117,7 @@ const App = () => {
             <button className="btn btn-primary" onClick={() => openLog()}>
               <Drift.Icon name="plus" size={14}/> <span className="btn-label">Log weight</span>
             </button>
-            <button className="icon-btn" aria-label="notifications"><Drift.Icon name="bell" size={17}/></button>
+            <button className="icon-btn" aria-label="daily weigh-in" onClick={openTodayLog}><Drift.Icon name="bell" size={17}/></button>
             <div className="avatar">HF</div>
             <button
               className="nav-menu-btn"
@@ -103,6 +161,22 @@ const App = () => {
         {screen === "insights" && <Drift.InsightsScreen onNav={goTo}/>} 
         {screen === "settings" && <Drift.SettingsScreen/>}
       </main>
+
+      {dailyPromptOpen && needsTodayLog && (
+        <div className="modal-backdrop" onClick={() => setDailyPromptOpen(false)}>
+          <div className="modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 420 }}>
+            <div className="t-eyebrow">New day</div>
+            <h2 style={{ fontSize: 34, fontWeight: 500, letterSpacing: "-0.03em", margin: "10px 0 8px" }}>Log today’s weight.</h2>
+            <p className="t-body" style={{ fontSize: 15, lineHeight: 1.5, marginBottom: 24 }}>
+              Your dashboard resets at 12:00 AM Toronto time. Add today’s weigh-in to start the new day clean.
+            </p>
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
+              <button className="btn btn-ghost" onClick={() => setDailyPromptOpen(false)}>Later</button>
+              <button className="btn btn-primary btn-lg" onClick={openTodayLog}><Drift.Icon name="plus" size={16}/> Log weight</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <Drift.LogWeightModal
         open={logOpen}
