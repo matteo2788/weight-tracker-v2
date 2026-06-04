@@ -1,0 +1,89 @@
+/* Drift — trends page readability + mobile chart sizing */
+.trend-page-fixed,
+.trend-page-fixed * {
+  color-scheme: light;
+}
+
+.trend-page-fixed .card,
+.trend-page-fixed .big-card {
+  color: var(--ink) !important;
+}
+
+.trend-page-fixed h1,
+.trend-page-fixed h2,
+.trend-page-fixed h3,
+.trend-page-fixed p,
+.trend-page-fixed span,
+.trend-page-fixed div {
+  text-shadow: none;
+}
+
+.trend-chart-big-mobile {
+  min-height: 420px;
+}
+
+@media (max-width: 720px) {
+  .trend-page-fixed.container.section {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .trend-page-fixed .section-head {
+    gap: 18px;
+  }
+
+  .trend-page-fixed .tabs {
+    width: 100%;
+    overflow-x: auto;
+    justify-content: flex-start;
+    padding: 4px;
+  }
+
+  .trend-page-fixed .tab {
+    flex: 0 0 auto;
+    min-width: 54px;
+  }
+
+  .trend-main-card {
+    margin-left: -2px;
+    margin-right: -2px;
+    border-radius: 28px;
+  }
+
+  .trend-main-grid {
+    display: block !important;
+  }
+
+  .trend-change-box {
+    width: 100%;
+    text-align: left !important;
+    margin-top: 8px;
+  }
+
+  .trend-chart-big-mobile {
+    min-height: 540px;
+    margin-left: -10px;
+    margin-right: -10px;
+  }
+
+  .trend-chart-big-mobile svg {
+    min-height: 520px !important;
+  }
+
+  .trend-page-fixed .trend-chart-wrap,
+  .trend-page-fixed .chart-shell,
+  .trend-page-fixed .chart-card {
+    min-height: 520px !important;
+  }
+
+  .trend-page-fixed .grid.grid-4,
+  .trend-page-fixed .grid.grid-3,
+  .trend-page-fixed .grid.grid-2 {
+    grid-template-columns: 1fr !important;
+  }
+
+  .trend-page-fixed .card,
+  .trend-page-fixed .big-card {
+    padding: 22px !important;
+  }
+}
