@@ -1,4 +1,4 @@
-// Mobile-safe TrendChart override with softer edges
+// Mobile-safe TrendChart override — clean modern chart
 (function () {
   const { useEffect, useRef, useState } = React;
 
@@ -39,21 +39,24 @@
 
     const mobile = w < 560;
     const chartHeight = mobile ? Math.max(330, height - 20) : height;
-    const padL = mobile ? 58 : 56;
-    const padR = mobile ? 18 : 30;
+    const padL = mobile ? 52 : 56;
+    const padR = mobile ? 22 : 30;
     const padT = mobile ? 30 : 28;
     const padB = mobile ? 64 : 44;
-    const edgeBreathingRoom = mobile ? 18 : 28;
-    const plotLeft = padL + edgeBreathingRoom;
-    const plotRight = w - padR - edgeBreathingRoom;
+    const edgeSpace = mobile ? 20 : 32;
+    const plotLeft = padL + edgeSpace;
+    const plotRight = w - padR - edgeSpace;
     const innerW = Math.max(40, plotRight - plotLeft);
     const innerH = Math.max(80, chartHeight - padT - padB);
 
-    const weights = data.map(d => d.weight);
-    const avgs = data.map(d => d.avg7);
-    const all = weights.concat(avgs).filter(Number.isFinite);
-    const min = Math.floor(Math.min(...all) - 0.7);
-    const max = Math.ceil(Math.max(...all) + 0.7);
+    const weights = data.map(d => d.weight).filter(Number.isFinite);
+    const avgs = data.map(d => d.avg7).filter(Number.isFinite);
+    const all = weights.concat(avgs);
+    const rawMin = Math.min(...all);
+    const rawMax = Math.max(...all);
+    const buffer = Math.max(0.8, (rawMax - rawMin) * 0.16);
+    const min = rawMin - buffer;
+    const max = rawMax + buffer;
     const span = max - min || 1;
 
     const xAt = (i) => plotLeft + (i * innerW) / (data.length - 1 || 1);
@@ -78,7 +81,7 @@
       return { d, xs, ys };
     };
 
-    const avgPath = buildSmooth(avgs);
+    const avgPath = buildSmooth(data.map(d => d.avg7));
     const gridSteps = mobile ? 3 : 4;
     const grid = Array.from({ length: gridSteps + 1 }, (_, i) => {
       const v = min + ((max - min) * i) / gridSteps;
@@ -125,10 +128,8 @@
       updateIndexFromClientX(e.touches[0].clientX, e.currentTarget);
     };
 
-    const softStroke = mobile ? 15 : 18;
-
     return (
-      <div ref={ref} className="trend-chart-fixed trend-chart-polished" style={{ position: "relative", width: "100%" }}>
+      <div ref={ref} className="trend-chart-fixed trend-chart-clean" style={{ position: "relative", width: "100%" }}>
         <svg
           width={w}
           height={chartHeight}
@@ -151,19 +152,6 @@
             userSelect: "none",
           }}
         >
-          <defs>
-            <filter id="trendSoftGlow" x="-8%" y="-18%" width="116%" height="136%">
-              <feGaussianBlur stdDeviation="7" result="blur"/>
-              <feColorMatrix in="blur" type="matrix" values="0 0 0 0 0.06 0 0 0 0 0.06 0 0 0 0 0.06 0 0 0 .16 0"/>
-            </filter>
-            <linearGradient id="trendLineFade" x1="0" x2="1" y1="0" y2="0">
-              <stop offset="0%" stopColor="var(--ink)" stopOpacity="0"/>
-              <stop offset="7%" stopColor="var(--ink)" stopOpacity="1"/>
-              <stop offset="93%" stopColor="var(--ink)" stopOpacity="1"/>
-              <stop offset="100%" stopColor="var(--ink)" stopOpacity="0"/>
-            </linearGradient>
-          </defs>
-
           {grid.map((g, i) => (
             <g key={i}>
               <line x1={padL} x2={w - padR} y1={g.y} y2={g.y} stroke="var(--line-soft)" strokeDasharray={i === 0 || i === gridSteps ? "0" : "2 4"}/>
@@ -182,15 +170,11 @@
             </g>
           ))}
 
-          {/* soft halo instead of hard area fill, so the chart never has boxy cut-off sides */}
-          <path d={avgPath.d} fill="none" stroke="var(--ink)" strokeWidth={softStroke} strokeLinecap="round" strokeLinejoin="round" opacity="0.055" filter="url(#trendSoftGlow)"/>
-          <path d={avgPath.d} fill="none" stroke="var(--ink)" strokeWidth={mobile ? 8 : 10} strokeLinecap="round" strokeLinejoin="round" opacity="0.045"/>
-
           {data.map((d, i) => (
-            <circle key={i} cx={xAt(i)} cy={yAt(d.weight)} r={mobile ? 1.8 : 2} fill="var(--ink-4)" opacity="0.48" />
+            <circle key={i} cx={xAt(i)} cy={yAt(d.weight)} r={mobile ? 1.7 : 1.9} fill="var(--ink-4)" opacity="0.46" />
           ))}
 
-          <path d={avgPath.d} fill="none" stroke="url(#trendLineFade)" strokeWidth={mobile ? 2.6 : 2.35} strokeLinecap="round" strokeLinejoin="round"/>
+          <path d={avgPath.d} fill="none" stroke="var(--ink)" strokeWidth={mobile ? 2.35 : 2.15} strokeLinecap="round" strokeLinejoin="round"/>
 
           {showAxes && xLabels.map((l, i) => {
             const anchor = mobile && i === 0 ? "start" : mobile && i === xLabels.length - 1 ? "end" : "middle";
@@ -203,9 +187,9 @@
             const dy = yAt(data[hoverIdx].weight);
             return (
               <g>
-                <line x1={hx} x2={hx} y1={padT} y2={padT + innerH} stroke="var(--ink-4)" strokeDasharray="3 3" opacity={mobile ? "0.8" : "1"}/>
+                <line x1={hx} x2={hx} y1={padT} y2={padT + innerH} stroke="var(--ink-4)" strokeDasharray="3 3" opacity={mobile ? "0.75" : "1"}/>
                 <circle cx={hx} cy={dy} r={mobile ? "4" : "3.5"} fill="var(--ink-4)" opacity="0.9"/>
-                <circle cx={hx} cy={hy} r={mobile ? "6" : "5"} fill="var(--card)" stroke="var(--ink)" strokeWidth="2"/>
+                <circle cx={hx} cy={hy} r={mobile ? "6" : "5"} fill="var(--paper)" stroke="var(--ink)" strokeWidth="2"/>
                 {mobile && (
                   <text x={hx} y={Math.max(18, hy - 14)} fontSize="11" fill="var(--ink)" textAnchor="middle" style={{ fontVariantNumeric: "tabular-nums", fontWeight: 650 }}>
                     {data[hoverIdx].avg7.toFixed(1)}
